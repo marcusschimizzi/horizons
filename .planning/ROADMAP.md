@@ -82,11 +82,11 @@ Plans:
   3. Scrolling at the Z=0 boundary or at Someday depth stops cleanly — no overscroll, no jitter
   4. Pressing the "home" button or keyboard shortcut animates the camera back to Z=0 (present)
   5. Moving the mouse across the canvas causes a subtle X/Y parallax shift that adds perceived depth
-**Plans**: TBD
+**Plans**: 2 plans in 2 waves
 
 Plans:
-- [ ] 04-01: `CameraController.tsx` — scroll event → Z target, lerp animation in `useFrame`, soft Z limits (CAM-01, CAM-02, CAM-03)
-- [ ] 04-02: Snap-to-present button + keyboard shortcut (CAM-04) and mouse-follow parallax (CAM-05)
+- [ ] 04-01-PLAN.md — Camera store + CameraRig: scroll-to-Z, damp3 lerp in useFrame, iOS spring-back + fog-stop boundaries (CAM-01, CAM-02, CAM-03)
+- [ ] 04-02-PLAN.md — SnapToPresent button + Home key shortcut (CAM-04), mouse-follow depth parallax (CAM-05)
 
 ### Phase 5: Capture
 **Goal**: The capture loop is end-to-end — a user can type a natural language intention into the input bubble, have Haiku parse and place it in the 3D scene at the correct horizon, and see it persist after a page refresh, all without the Anthropic key ever reaching the client.
