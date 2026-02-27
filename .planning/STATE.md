@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** The spatial view must make you feel your future — if the 3D scene doesn't feel meaningfully different from a list, nothing else matters.
-**Current focus:** Phase 6 — Task Interactions (In progress)
+**Current focus:** Phase 6 — Task Interactions (Complete)
 
 ## Current Position
 
-Phase: 6 of 7 (Task Interactions) — In progress
-Plan: 2 of 3 in phase 6 complete
-Status: In progress
-Last activity: 2026-02-27 — Completed 06-02-PLAN.md
+Phase: 6 of 7 (Task Interactions) — Complete
+Plan: 3 of 3 in phase 6 complete
+Status: Phase complete
+Last activity: 2026-02-27 — Completed 06-03-PLAN.md
 
-Progress: [█████████████████████████░] ~76% (16 plans of ~21 estimated total)
+Progress: [██████████████████████████░] ~81% (17 plans of ~21 estimated total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 16
+- Total plans completed: 17
 - Average duration: 2 min
-- Total execution time: 39 min
+- Total execution time: 42 min
 
 **By Phase:**
 
@@ -32,10 +32,10 @@ Progress: [███████████████████████
 | 03-3d-scene | 4/4 | 5 min | 1 min |
 | 04-camera | 2/2 | 5 min | 3 min |
 | 05-capture | 3/3 | ~20 min | ~7 min |
-| 06-task-interactions | 2/3 | 6 min | 3 min |
+| 06-task-interactions | 3/3 | 9 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 05-01 (2 min), 05-02 (2 min), 06-01 (2 min), 06-02 (4 min)
+- Last 5 plans: 05-02 (2 min), 06-01 (2 min), 06-02 (4 min), 06-03 (3 min)
 - Trend: consistent
 
 *Updated after each plan completion*
@@ -97,6 +97,11 @@ Recent decisions affecting current work:
 - CompletionBurst uses delta-based timing for R3F demand frameloop compatibility
 - Optimistic removal pattern: startCompletion -> animation -> finishCompletion -> removeTask
 - Undo toast z-index 130 (above TaskDetail panel 120)
+- Reschedule pills replace old stub button; horizon band selector between textarea and action bar
+- Camera auto-pans to rescheduled horizon when >20 z-units away from current view
+- damp3 position drift smooth time 0.4s for TaskNode animated group wrapper
+- Dirty refs prevent spurious PATCH on panel open — auto-save only fires when user has actually edited
+- Debounced auto-save pattern: 1s debounce + immediate save on blur for title and rawInput
 
 ### Pending Todos
 
@@ -111,5 +116,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 06-02-PLAN.md (Complete/Drop actions with animations and persistence)
+Stopped at: Completed 06-03-PLAN.md (Reschedule + Edit actions — Phase 6 complete)
 Resume file: None
