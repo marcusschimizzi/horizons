@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** The spatial view must make you feel your future — if the 3D scene doesn't feel meaningfully different from a list, nothing else matters.
-**Current focus:** Phase 4 — Camera (Complete)
+**Current focus:** Phase 5 — Capture (In progress)
 
 ## Current Position
 
-Phase: 4 of 7 (Camera)
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-02-27 — Completed 04-02-PLAN.md
+Phase: 5 of 7 (Capture)
+Plan: 1 of 3 in current phase
+Status: In progress
+Last activity: 2026-02-27 — Completed 05-01-PLAN.md
 
-Progress: [████████████████████░░] ~52% (11 plans of ~21 estimated total)
+Progress: [█████████████████████░░] ~57% (12 plans of ~21 estimated total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
+- Total plans completed: 13
 - Average duration: 2 min
-- Total execution time: 29 min
+- Total execution time: 31 min
 
 **By Phase:**
 
@@ -31,9 +31,10 @@ Progress: [████████████████████░░] ~
 | 02-data-layer | 2/2 | 9 min | 5 min |
 | 03-3d-scene | 4/4 | 5 min | 1 min |
 | 04-camera | 2/2 | 5 min | 3 min |
+| 05-capture | 1/3 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-03 (1 min), 03-04 (1 min), 04-01 (2 min), 04-02 (3 min)
+- Last 5 plans: 03-04 (1 min), 04-01 (2 min), 04-02 (3 min), 05-01 (2 min)
 - Trend: consistent
 
 *Updated after each plan completion*
@@ -82,6 +83,8 @@ Recent decisions affecting current work:
 - SnapToPresent is a plain DOM overlay (not R3F) — rendered as sibling to Canvas, uses cameraStore subscription for visibility
 - Combined damp3 on [parallaxX, parallaxY, targetZ] — single call handles parallax and scroll simultaneously
 - DOM-to-Canvas invalidation bridge via cameraStore.subscribe in CameraRig — triggers invalidate() when isAnimating becomes true
+- InputBubble z-index 110 above SnapToPresent z-index 100, SnapToPresent repositioned to bottom:88
+- Injected style tag for CSS keyframes in inline-style-only overlay components
 
 ### Pending Todos
 
@@ -90,11 +93,11 @@ None.
 ### Blockers/Concerns
 
 - Two open architecture questions to resolve during future phase planning:
-  - Haiku JSON reliability — tool use vs raw JSON in `/api/parse`? Decide before building Phase 5.
+  - Haiku JSON reliability — tool use vs raw JSON in `/api/parse`? Decide before building Phase 5 Plan 02.
   - Drift increment trigger — RSC on-load check (simplest) vs cron vs client mount. Decide before Phase 7.
 
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 04-02-PLAN.md (Phase 4 complete — snap-to-present + parallax, all 5 CAM requirements met)
+Stopped at: Completed 05-01-PLAN.md (InputBubble UI shell created and wired into HorizonScene)
 Resume file: None
