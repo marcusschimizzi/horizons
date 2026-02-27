@@ -60,17 +60,17 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. Tasks are visible in the 3D scene positioned at Z-depths corresponding to their horizon band (Immediate nearest, Someday farthest)
   2. Distant tasks are noticeably blurred and shrunk by exponential fog — proximity equals legibility at a glance
-  3. Close tasks (Immediate, This Week) render as Html cards showing title, tags, date range, and drift indicator
+  3. Close tasks (Immediate, This Week) render as Html cards showing title only
   4. Distant tasks (This Month+) render as colored glowing sprites — no text, colored by tag category
   5. Moving the camera causes cards to flip to sprites and vice versa smoothly (no pop)
   6. The background includes a star field / particles and bloom post-processing is active on emissive nodes
-**Plans**: TBD
+**Plans**: 4 plans in 3 waves
 
 Plans:
-- [ ] 03-01: `HorizonScene.tsx` — Canvas setup (`frameloop="demand"`, `ssr: false`), fog (`fogExp2`), lighting, background particles/star field, `invalidate()` Zustand subscription
-- [ ] 03-02: `TaskSprite.tsx` — Billboard mesh with emissive material, glow color by tag category (VIS-01), bloom post-processing (VIS-02)
-- [ ] 03-03: `TaskCard.tsx` — drei Html card with title, tags, date range, drift indicator, hard-deadline pulse ring (VIS-03)
-- [ ] 03-04: `TaskNode.tsx` — LOD controller switching between TaskCard and TaskSprite at distance threshold, smooth transition (SCENE-05)
+- [ ] 03-01-PLAN.md — Canvas setup (fog, lights, stars, bloom, invalidate), scene-constants.ts (Wave 1)
+- [ ] 03-02-PLAN.md — TaskSprite.tsx: billboard emissive circle, tag-based glow color, bloom (Wave 2)
+- [ ] 03-03-PLAN.md — TaskCard.tsx: drei Html card, title only, deadline ring, drift indicator (Wave 2)
+- [ ] 03-04-PLAN.md — TaskNode.tsx LOD controller, DebugOverlay, full scene integration (Wave 3)
 
 ### Phase 4: Camera
 **Goal**: The signature interaction works — users can fly through time by scrolling, feel momentum and easing as they move, cannot scroll out of bounds, can snap back to the present instantly, and experience subtle parallax that reinforces depth perception.
