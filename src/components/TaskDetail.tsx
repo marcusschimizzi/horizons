@@ -3,6 +3,11 @@
 import { useRef, useState, useEffect, useCallback, useContext } from 'react';
 import { useSelectedTask, useTaskStore, TaskStoreContext } from '@/stores/task-store';
 import type { TaskRow } from '@/types/task';
+import type { Horizon } from '@/lib/horizons';
+import { getZDepth } from '@/lib/horizons';
+import { horizonToDateRange } from '@/lib/horizon-dates';
+import { cameraStore } from '@/stores/camera-store';
+import { SCENE_CONSTANTS } from '@/lib/scene-constants';
 
 const HORIZON_LABELS: Record<string, string> = {
   'immediate': 'Immediate',
@@ -21,6 +26,15 @@ const HORIZON_COLORS: Record<string, string> = {
   'this-year': '#6366f1',
   'someday': '#64748b',
 };
+
+const HORIZON_OPTIONS: { value: Horizon; label: string }[] = [
+  { value: 'immediate', label: 'Immediate' },
+  { value: 'this-week', label: 'This Week' },
+  { value: 'this-month', label: 'This Month' },
+  { value: 'this-quarter', label: 'This Quarter' },
+  { value: 'this-year', label: 'This Year' },
+  { value: 'someday', label: 'Someday' },
+];
 
 type ActionResult = 'completed' | 'dropped' | null;
 
@@ -137,6 +151,57 @@ export function TaskDetail() {
     }, 1000);
   }, [store, task]);
 
+  const handleReschedule = useCallback((newHorizon: Horizon) => {
+    if (!store || !task) return;
+    if (newHorizon === task.horizon) return;
+
+    const { earliest, latest } = horizonToDateRange(newHorizon);
+
+    // Snapshot current dates for revert
+    const state = store.getState();
+    const taskRow = state.tasks.find((t) => t.id === task.id);
+    const prevEarliest = taskRow?.targetDateEarliest ?? null;
+    const prevLatest = taskRow?.targetDateLatest ?? null;
+
+    // Optimistic update
+    state.updateTask(task.id, {
+      targetDateEarliest: earliest,
+      targetDateLatest: latest,
+    });
+
+    // Close panel so user can watch the task drift
+    state.clearSelection();
+
+    // Camera auto-pan to new horizon if needed
+    const targetZDepth = getZDepth(newHorizon);
+    const currentZ = cameraStore.getState().currentZ;
+    const { nearBoundary, farBoundary } = SCENE_CONSTANTS;
+    // Check if the target Z is outside the visible range (rough heuristic: +/-15 from camera)
+    if (targetZDepth < currentZ - 20 || targetZDepth > nearBoundary) {
+      cameraStore.setState({
+        targetZ: Math.max(farBoundary, Math.min(nearBoundary, targetZDepth + 10)),
+        velocity: 0,
+        isAnimating: true,
+      });
+    }
+
+    // Persist to server
+    fetch(`/api/tasks/${task.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        targetDateEarliest: earliest.toISOString(),
+        targetDateLatest: latest.toISOString(),
+      }),
+    }).catch(() => {
+      // Revert optimistic update on failure
+      store.getState().updateTask(task.id, {
+        targetDateEarliest: prevEarliest,
+        targetDateLatest: prevLatest,
+      });
+    });
+  }, [store, task]);
+
   // --- Styles ---
 
   const panelStyle: React.CSSProperties = {
@@ -251,6 +316,25 @@ export function TaskDetail() {
     minHeight: 120,
   };
 
+  const rescheduleSectionStyle: React.CSSProperties = {
+    padding: '12px 20px 0 20px',
+  };
+
+  const rescheduleLabelStyle: React.CSSProperties = {
+    fontSize: 11,
+    color: '#64748b',
+    fontFamily: 'monospace',
+    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+  };
+
+  const reschedulePillsStyle: React.CSSProperties = {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: 6,
+  };
+
   const actionBarStyle: React.CSSProperties = {
     marginTop: 'auto',
     padding: '16px 20px',
@@ -283,13 +367,6 @@ export function TaskDetail() {
     background: 'rgba(239, 68, 68, 0.1)',
     color: '#94a3b8',
     border: '1px solid rgba(148, 163, 184, 0.15)',
-  };
-
-  const rescheduleBtnStyle: React.CSSProperties = {
-    ...btnBase,
-    background: 'rgba(59, 130, 246, 0.12)',
-    color: '#3b82f6',
-    border: '1px solid rgba(59, 130, 246, 0.3)',
   };
 
   const overlayStyle: React.CSSProperties = {
@@ -386,6 +463,38 @@ export function TaskDetail() {
               readOnly
             />
 
+            <div style={rescheduleSectionStyle}>
+              <div style={rescheduleLabelStyle}>Reschedule</div>
+              <div style={reschedulePillsStyle}>
+                {HORIZON_OPTIONS.map((opt) => {
+                  const isCurrent = task.horizon === opt.value;
+                  const color = HORIZON_COLORS[opt.value] || '#64748b';
+                  const pillStyle: React.CSSProperties = {
+                    padding: '5px 12px',
+                    borderRadius: 16,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    fontFamily: 'monospace',
+                    cursor: isCurrent ? 'default' : 'pointer',
+                    border: `1px solid ${isCurrent ? color : 'rgba(148, 163, 184, 0.2)'}`,
+                    background: isCurrent ? `${color}22` : 'rgba(30, 30, 40, 0.5)',
+                    color: isCurrent ? color : '#94a3b8',
+                    transition: 'all 0.15s ease',
+                  };
+                  return (
+                    <button
+                      key={opt.value}
+                      style={pillStyle}
+                      onClick={() => handleReschedule(opt.value)}
+                      disabled={actionResult !== null}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             <div style={actionBarStyle}>
               <button
                 style={completeBtnStyle}
@@ -400,13 +509,6 @@ export function TaskDetail() {
                 disabled={actionResult !== null}
               >
                 Drop
-              </button>
-              <button
-                style={rescheduleBtnStyle}
-                onClick={() => console.log('reschedule', task.id)}
-                disabled={actionResult !== null}
-              >
-                Reschedule
               </button>
             </div>
           </>
