@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** The spatial view must make you feel your future — if the 3D scene doesn't feel meaningfully different from a list, nothing else matters.
-**Current focus:** Phase 3 — 3D Scene (COMPLETE)
+**Current focus:** Phase 4 — Camera (In progress)
 
 ## Current Position
 
-Phase: 3 of 7 (3D Scene)
-Plan: 4 of 4 in current phase
-Status: Phase complete
-Last activity: 2026-02-27 — Completed 03-04-PLAN.md
+Phase: 4 of 7 (Camera)
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-02-27 — Completed 04-01-PLAN.md
 
-Progress: [███████████████████░] ~48% (10 plans of ~21 estimated total)
+Progress: [████████████████████░░] ~52% (11 plans of ~21 estimated total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 10
+- Total plans completed: 11
 - Average duration: 2 min
-- Total execution time: 24 min
+- Total execution time: 26 min
 
 **By Phase:**
 
@@ -30,10 +30,11 @@ Progress: [███████████████████░] ~48% (1
 | 01-foundation | 3/3 | 10 min | 3 min |
 | 02-data-layer | 2/2 | 9 min | 5 min |
 | 03-3d-scene | 4/4 | 5 min | 1 min |
+| 04-camera | 1/2 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-01 (2 min), 03-02 (1 min), 03-03 (1 min), 03-04 (1 min)
-- Trend: accelerating
+- Last 5 plans: 03-02 (1 min), 03-03 (1 min), 03-04 (1 min), 04-01 (2 min)
+- Trend: consistent
 
 *Updated after each plan completion*
 
@@ -75,6 +76,9 @@ Recent decisions affecting current work:
 - Categorical LOD split using Set lookup on cardHorizons, not camera distance
 - DebugOverlay rendered as sibling to Canvas (plain DOM), not inside R3F
 - TaskNode isCard variable kept explicit for Phase 4 hysteresis extension
+- Vanilla Zustand store (createStore) for camera state — non-reactive getState() in useFrame avoids React re-renders
+- Exponential rubber-band formula for near boundary overscroll — maxOverscroll * (1 - exp(-overscroll/maxOverscroll))
+- Spring-back triggers when velocity < 0.5 while past nearBoundary (not immediately, so user feels resistance)
 
 ### Pending Todos
 
@@ -85,10 +89,9 @@ None.
 - Two open architecture questions to resolve during future phase planning:
   - Haiku JSON reliability — tool use vs raw JSON in `/api/parse`? Decide before building Phase 5.
   - Drift increment trigger — RSC on-load check (simplest) vs cron vs client mount. Decide before Phase 7.
-- LOD distance threshold question resolved: categorical horizon-based split (no distance calc needed for Phase 3; Phase 4 may add camera-distance hysteresis)
 
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 03-04-PLAN.md (Phase 3 complete — TaskNode LOD integration with DebugOverlay)
+Stopped at: Completed 04-01-PLAN.md (Camera store + CameraRig with scroll-driven Z-axis movement)
 Resume file: None
