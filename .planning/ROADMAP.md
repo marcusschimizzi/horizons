@@ -13,7 +13,7 @@ Horizon is a personal-use PoC that bets a single thesis: a 3D spatial view where
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Foundation** - Next.js scaffold, DB schema, Drizzle migrations, shared types, horizon math library
-- [ ] **Phase 2: Data Layer** - CRUD API routes, seed data, Zustand store, SceneLoader client boundary
+- [x] **Phase 2: Data Layer** - CRUD API routes, seed data, Zustand store, SceneLoader client boundary
 - [ ] **Phase 3: 3D Scene** - Canvas, fog, atmosphere, TaskNodes with LOD (card + sprite), visual system
 - [ ] **Phase 4: Camera** - Scroll Z-axis movement, easing/momentum, limits, snap-to-present, mouse parallax
 - [ ] **Phase 5: Capture** - Natural language input bubble, Haiku parse route, persistence, entrance animation
@@ -148,7 +148,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 3/3 | Complete | 2026-02-27 |
-| 2. Data Layer | 0/2 | Not started | - |
+| 2. Data Layer | 2/2 | Complete | 2026-02-27 |
 | 3. 3D Scene | 0/4 | Not started | - |
 | 4. Camera | 0/2 | Not started | - |
 | 5. Capture | 0/3 | Not started | - |
