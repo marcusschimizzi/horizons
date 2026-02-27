@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** The spatial view must make you feel your future — if the 3D scene doesn't feel meaningfully different from a list, nothing else matters.
-**Current focus:** Phase 6 — Task Interactions (Not started)
+**Current focus:** Phase 6 — Task Interactions (In progress)
 
 ## Current Position
 
-Phase: 5 of 7 (Capture) — Complete
-Plan: Phase 6 not yet started
-Status: Phase 5 complete, Phase 6 ready
-Last activity: 2026-02-27 — Completed Phase 5 (Capture)
+Phase: 6 of 7 (Task Interactions) — In progress
+Plan: 1 of 3 in phase 6 complete
+Status: In progress
+Last activity: 2026-02-27 — Completed 06-01-PLAN.md
 
-Progress: [██████████████████████░░] ~62% (13 plans of ~21 estimated total)
+Progress: [████████████████████████░░] ~71% (15 plans of ~21 estimated total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 14
+- Total plans completed: 15
 - Average duration: 2 min
-- Total execution time: 33 min
+- Total execution time: 35 min
 
 **By Phase:**
 
@@ -32,9 +32,10 @@ Progress: [██████████████████████░
 | 03-3d-scene | 4/4 | 5 min | 1 min |
 | 04-camera | 2/2 | 5 min | 3 min |
 | 05-capture | 3/3 | ~20 min | ~7 min |
+| 06-task-interactions | 1/3 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-01 (2 min), 04-02 (3 min), 05-01 (2 min), 05-02 (2 min)
+- Last 5 plans: 04-02 (3 min), 05-01 (2 min), 05-02 (2 min), 06-01 (2 min)
 - Trend: consistent
 
 *Updated after each plan completion*
@@ -88,6 +89,9 @@ Recent decisions affecting current work:
 - zodOutputFormat with messages.parse() for guaranteed schema-compliant AI extraction (no retry logic)
 - Module-level Anthropic client singleton in route handler (reused across requests)
 - System prompt includes dynamic today date for relative date resolution
+- TaskDetail z-index 120 (panel) / 119 (backdrop) above InputBubble 110 and SnapToPresent 100
+- Panel always in DOM with CSS transform toggle for smooth slide-in (no mount/unmount)
+- Action buttons (Complete, Drop, Reschedule) are stubs in 06-01 — wiring deferred to 06-02
 
 ### Pending Todos
 
@@ -102,5 +106,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Phase 5 complete — capture loop end-to-end verified
+Stopped at: Completed 06-01-PLAN.md (click-to-panel foundation)
 Resume file: None
