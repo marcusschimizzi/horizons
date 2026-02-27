@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback, useContext } from 'react';
 import { TaskStoreContext, deserializeTask } from '@/stores/task-store';
 import { getHorizon, getZDepth } from '@/lib/horizons';
 import { cameraStore } from '@/stores/camera-store';
+import { SCENE_CONSTANTS } from '@/lib/scene-constants';
 import type { TaskRow } from '@/types/task';
 import type { ParsedTask } from '@/app/api/parse/route';
 
@@ -149,7 +150,8 @@ export function InputBubble() {
     const { currentZ } = cameraStore.getState();
     const isVisible = horizonZ <= currentZ && horizonZ >= currentZ - 15;
     if (!isVisible) {
-      cameraStore.setState({ targetZ: horizonZ + 7.5, isAnimating: true });
+      const targetZ = Math.max(horizonZ + 7.5, SCENE_CONSTANTS.farBoundary);
+      cameraStore.setState({ targetZ, velocity: 0, isAnimating: true });
     }
 
     // Step 8: Background persist (fire and forget)

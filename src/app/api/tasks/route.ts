@@ -32,7 +32,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const [created] = await db.insert(tasks).values(body).returning();
+    const [created] = await db
+      .insert(tasks)
+      .values({
+        title: body.title.trim(),
+        rawInput: body.rawInput.trim(),
+        targetDateEarliest: body.targetDateEarliest ? new Date(body.targetDateEarliest) : null,
+        targetDateLatest: body.targetDateLatest ? new Date(body.targetDateLatest) : null,
+        needsRefinement: body.needsRefinement ?? false,
+        tags: body.tags ?? null,
+        status: body.status ?? 'active',
+      })
+      .returning();
     return Response.json(created, { status: 201 });
   } catch {
     return Response.json(
