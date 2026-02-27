@@ -9,28 +9,29 @@ See: .planning/PROJECT.md (updated 2026-02-26)
 
 ## Current Position
 
-Phase: 1 of 7 (Foundation)
-Plan: 3 of 3 in current phase
-Status: Phase complete
-Last activity: 2026-02-27 — Completed 01-03-PLAN.md
+Phase: 2 of 7 (Data Layer)
+Plan: 1 of 2 in current phase
+Status: In progress
+Last activity: 2026-02-27 — Completed 02-01-PLAN.md
 
-Progress: [███████░░░░░░░░░░░░░] ~15% (3 plans of ~20 estimated total)
+Progress: [████████░░░░░░░░░░░░] ~20% (4 plans of ~20 estimated total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: 3 min
-- Total execution time: 10 min
+- Total plans completed: 4
+- Average duration: 4 min
+- Total execution time: 15 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 3/3 | 10 min | 3 min |
+| 02-data-layer | 1/2 | 5 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (4 min), 01-02 (2 min), 01-03 (4 min)
+- Last 5 plans: 01-01 (4 min), 01-02 (2 min), 01-03 (4 min), 02-01 (5 min)
 - Trend: stable
 
 *Updated after each plan completion*
@@ -57,6 +58,10 @@ Recent decisions affecting current work:
 - Boundary values (1, 7, 30, 90, 365 days) inclusive to nearer horizon (<=)
 - Past/overdue dates clamp to 'immediate' horizon
 - Vitest for testing with TDD red-green-refactor workflow
+- Seed script creates standalone DB pool to bypass server-only guard
+- npm run db:seed uses node --env-file=.env.local --import=tsx for env loading
+- API error shape: { error: string, code: string } with INTERNAL_ERROR, VALIDATION_ERROR, TASK_NOT_FOUND
+- PATCH uses allowlist of updatable fields (strips unknown keys)
 
 ### Pending Todos
 
@@ -72,5 +77,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 01-03-PLAN.md (horizon math and spatial positioning — Phase 1 complete)
+Stopped at: Completed 02-01-PLAN.md (CRUD API routes + seed script)
 Resume file: None
