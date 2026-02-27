@@ -22,6 +22,7 @@
     "@react-three/postprocessing": "^3.0.4",
     "drizzle-orm": "^0.45.1",
     "next": "16.1.6",
+    "normalize-wheel-es": "^1.2.0",
     "pg": "^8.19.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",

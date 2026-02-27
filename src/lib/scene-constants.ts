@@ -35,6 +35,15 @@ export const SCENE_CONSTANTS = {
 
   // Hysteresis buffer (z-units camera must move past threshold before switching back)
   hysteresisBuffer: 3,
+
+  // Camera
+  cameraRestZ: 10,            // Default Z position — matches Canvas camera prop
+  nearBoundary: 10,           // Z=10 is the present; camera cannot scroll past toward viewer
+  farBoundary: -120,          // End of 'someday' band (hard stop)
+  maxOverscroll: 3,           // Max Z-units rubber-band can stretch past nearBoundary
+  zSmoothTime: 0.25,          // smoothTime for damp3 on Z-axis (lower = snappier)
+  zUnitsPerPixel: 0.08,       // Scroll delta multiplier (~5-8 z-units per normal tick)
+  springBackSmoothTime: 0.15, // Faster smoothTime for spring-back from overscroll
 } as const;
 
 export type SceneConstants = typeof SCENE_CONSTANTS;
