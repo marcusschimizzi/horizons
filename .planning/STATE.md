@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-02-26)
 
 ## Current Position
 
-Phase: 2 of 7 (Data Layer)
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-02-27 — Completed 02-02-PLAN.md
+Phase: 3 of 7 (3D Scene)
+Plan: 1 of 4 in current phase
+Status: In progress
+Last activity: 2026-02-27 — Completed 03-01-PLAN.md
 
-Progress: [█████████░░░░░░░░░░░] ~25% (5 plans of ~21 estimated total)
+Progress: [██████████░░░░░░░░░░] ~29% (6 plans of ~21 estimated total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
+- Total plans completed: 6
 - Average duration: 4 min
-- Total execution time: 19 min
+- Total execution time: 21 min
 
 **By Phase:**
 
@@ -29,9 +29,10 @@ Progress: [█████████░░░░░░░░░░░] ~25% (5
 |-------|-------|-------|----------|
 | 01-foundation | 3/3 | 10 min | 3 min |
 | 02-data-layer | 2/2 | 9 min | 5 min |
+| 03-3d-scene | 1/4 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (2 min), 01-03 (4 min), 02-01 (5 min), 02-02 (4 min)
+- Last 5 plans: 01-03 (4 min), 02-01 (5 min), 02-02 (4 min), 03-01 (2 min)
 - Trend: stable
 
 *Updated after each plan completion*
@@ -65,6 +66,8 @@ Recent decisions affecting current work:
 - Zustand store file must use .tsx extension (contains JSX for Context.Provider)
 - Context.Provider accessed via extracted variable (Next.js 16 Turbopack namespace resolution issue)
 - React 19 Context-as-JSX pattern not yet supported by Next.js 16 build toolchain
+- Imperative FogExp2 via useEffect rather than declarative JSX (React 19 compatibility)
+- TaskStoreContext exported from task-store.tsx for SceneInvalidator direct store subscription
 
 ### Pending Todos
 
@@ -80,5 +83,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 02-02-PLAN.md (Zustand store + SceneLoader + page.tsx wiring — Phase 2 complete)
+Stopped at: Completed 03-01-PLAN.md (R3F Canvas with fog, bloom, stars, and Zustand invalidation)
 Resume file: None
