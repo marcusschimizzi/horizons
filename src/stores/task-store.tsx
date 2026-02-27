@@ -13,6 +13,7 @@ import { type Horizon, getHorizon } from '@/lib/horizons';
 interface TaskState {
   tasks: TaskRow[];
   newTaskIds: Set<string>;
+  selectedTaskId: string | null;
 }
 
 interface TaskActions {
@@ -23,6 +24,8 @@ interface TaskActions {
   removeTask: (id: string) => void;
   clearNewTask: (id: string) => void;
   refresh: () => Promise<void>;
+  selectTask: (id: string) => void;
+  clearSelection: () => void;
 }
 
 type TaskStore = TaskState & TaskActions;
@@ -56,6 +59,7 @@ function createTaskStore(initialTasks: TaskRow[]) {
   return createStore<TaskStore>()((set) => ({
     tasks: initialTasks,
     newTaskIds: new Set<string>(),
+    selectedTaskId: null,
 
     setTasks: (tasks: TaskRow[]) => set({ tasks }),
 
@@ -108,6 +112,9 @@ function createTaskStore(initialTasks: TaskRow[]) {
       const tasks = rawTasks.map(deserializeTask);
       set({ tasks });
     },
+
+    selectTask: (id: string) => set({ selectedTaskId: id }),
+    clearSelection: () => set({ selectedTaskId: null }),
   }));
 }
 
@@ -196,8 +203,25 @@ function useIsNewTask(taskId: string): boolean {
   return useTaskStore((state) => state.newTaskIds.has(taskId));
 }
 
+function useSelectedTask(): Task | null {
+  const selectedId = useTaskStore((state) => state.selectedTaskId);
+  const tasks = useTaskStore((state) => state.tasks);
+
+  if (!selectedId) return null;
+  const row = tasks.find((t) => t.id === selectedId);
+  if (!row) return null;
+
+  const targetDate: DateRange | null =
+    row.targetDateEarliest && row.targetDateLatest
+      ? { earliest: row.targetDateEarliest, latest: row.targetDateLatest }
+      : null;
+  const horizon = getHorizon(targetDate, new Date());
+
+  return { ...row, horizon, targetDate };
+}
+
 // ---------------------------------------------------------------------------
 // Exports
 // ---------------------------------------------------------------------------
 
-export { TaskStoreContext, TaskStoreProvider, useTaskStore, useTasksWithHorizon, useTasksByHorizon, useIsNewTask };
+export { TaskStoreContext, TaskStoreProvider, useTaskStore, useTasksWithHorizon, useTasksByHorizon, useIsNewTask, useSelectedTask };

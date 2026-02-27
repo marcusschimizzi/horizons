@@ -58,6 +58,8 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    pointerEvents: 'auto',
+    cursor: 'pointer',
     // Entrance animation
     opacity: entered ? driftOpacity : 0,
     transform: entered ? 'scale(1)' : 'scale(0.85)',
@@ -86,7 +88,7 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
         distanceFactor={SCENE_CONSTANTS.htmlDistanceFactor}
         style={{ pointerEvents: 'none' }}
       >
-        <div style={cardStyle}>{task.title}</div>
+        <div style={cardStyle} onClick={() => store?.getState().selectTask(task.id)}>{task.title}</div>
       </Html>
     </group>
   );

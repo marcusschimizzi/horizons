@@ -91,7 +91,11 @@ export function TaskSprite({ task, position, isNew }: TaskSpriteProps) {
     <group position={position}>
       <group ref={groupRef} scale={isNew ? [0, 0, 0] : [1, 1, 1]}>
         <Billboard>
-          <mesh>
+          <mesh
+            onClick={(e) => { e.stopPropagation(); store?.getState().selectTask(task.id); }}
+            onPointerOver={() => { document.body.style.cursor = 'pointer'; }}
+            onPointerOut={() => { document.body.style.cursor = 'auto'; }}
+          >
             <circleGeometry args={[radius, 32]} />
             <meshBasicMaterial
               ref={materialRef}
