@@ -13,6 +13,8 @@ import { type Horizon, getHorizon } from '@/lib/horizons';
 interface TaskState {
   tasks: TaskRow[];
   newTaskIds: Set<string>;
+  completingTaskIds: Set<string>;
+  droppingTaskIds: Set<string>;
   selectedTaskId: string | null;
 }
 
@@ -26,6 +28,12 @@ interface TaskActions {
   refresh: () => Promise<void>;
   selectTask: (id: string) => void;
   clearSelection: () => void;
+  startCompletion: (id: string) => void;
+  finishCompletion: (id: string) => void;
+  cancelCompletion: (id: string) => void;
+  restoreTask: (task: TaskRow) => void;
+  startDrop: (id: string) => void;
+  finishDrop: (id: string) => void;
 }
 
 type TaskStore = TaskState & TaskActions;
@@ -59,6 +67,8 @@ function createTaskStore(initialTasks: TaskRow[]) {
   return createStore<TaskStore>()((set) => ({
     tasks: initialTasks,
     newTaskIds: new Set<string>(),
+    completingTaskIds: new Set<string>(),
+    droppingTaskIds: new Set<string>(),
     selectedTaskId: null,
 
     setTasks: (tasks: TaskRow[]) => set({ tasks }),
@@ -115,6 +125,60 @@ function createTaskStore(initialTasks: TaskRow[]) {
 
     selectTask: (id: string) => set({ selectedTaskId: id }),
     clearSelection: () => set({ selectedTaskId: null }),
+
+    startCompletion: (id: string) =>
+      set((state) => {
+        const ids = new Set(state.completingTaskIds);
+        ids.add(id);
+        return { completingTaskIds: ids };
+      }),
+
+    finishCompletion: (id: string) =>
+      set((state) => {
+        const completing = new Set(state.completingTaskIds);
+        completing.delete(id);
+        const newIds = new Set(state.newTaskIds);
+        newIds.delete(id);
+        return {
+          completingTaskIds: completing,
+          tasks: state.tasks.filter((t) => t.id !== id),
+          newTaskIds: newIds,
+        };
+      }),
+
+    cancelCompletion: (id: string) =>
+      set((state) => {
+        const ids = new Set(state.completingTaskIds);
+        ids.delete(id);
+        return { completingTaskIds: ids };
+      }),
+
+    restoreTask: (task: TaskRow) =>
+      set((state) => ({
+        tasks: state.tasks.some((t) => t.id === task.id)
+          ? state.tasks
+          : [...state.tasks, task],
+      })),
+
+    startDrop: (id: string) =>
+      set((state) => {
+        const ids = new Set(state.droppingTaskIds);
+        ids.add(id);
+        return { droppingTaskIds: ids };
+      }),
+
+    finishDrop: (id: string) =>
+      set((state) => {
+        const dropping = new Set(state.droppingTaskIds);
+        dropping.delete(id);
+        const newIds = new Set(state.newTaskIds);
+        newIds.delete(id);
+        return {
+          droppingTaskIds: dropping,
+          tasks: state.tasks.filter((t) => t.id !== id),
+          newTaskIds: newIds,
+        };
+      }),
   }));
 }
 
@@ -221,7 +285,19 @@ function useSelectedTask(): Task | null {
 }
 
 // ---------------------------------------------------------------------------
+// Completing/Dropping selectors
+// ---------------------------------------------------------------------------
+
+function useIsCompleting(taskId: string): boolean {
+  return useTaskStore((state) => state.completingTaskIds.has(taskId));
+}
+
+function useIsDropping(taskId: string): boolean {
+  return useTaskStore((state) => state.droppingTaskIds.has(taskId));
+}
+
+// ---------------------------------------------------------------------------
 // Exports
 // ---------------------------------------------------------------------------
 
-export { TaskStoreContext, TaskStoreProvider, useTaskStore, useTasksWithHorizon, useTasksByHorizon, useIsNewTask, useSelectedTask };
+export { TaskStoreContext, TaskStoreProvider, useTaskStore, useTasksWithHorizon, useTasksByHorizon, useIsNewTask, useIsCompleting, useIsDropping, useSelectedTask };

@@ -1,6 +1,6 @@
 'use client';
 
-import { useContext, useEffect, useMemo } from 'react';
+import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { Stars } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
@@ -10,6 +10,7 @@ import { SCENE_CONSTANTS } from '@/lib/scene-constants';
 import { TaskStoreContext, useTasksWithHorizon } from '@/stores/task-store';
 import { getTaskPosition, applyOverlapAvoidance } from '@/lib/spatial';
 import { TaskNode } from './TaskNode';
+import { CompletionBurst } from './CompletionBurst';
 import { CameraRig } from './CameraRig';
 import { DebugOverlay } from './DebugOverlay';
 import { SnapToPresent } from './SnapToPresent';
@@ -59,8 +60,16 @@ function FogSetup() {
 // TaskNodes — renders TaskNode for each task at its computed position
 // ---------------------------------------------------------------------------
 
+interface BurstEntry {
+  id: string;
+  position: [number, number, number];
+}
+
 function TaskNodes() {
   const tasks = useTasksWithHorizon();
+  const store = useContext(TaskStoreContext);
+  const [bursts, setBursts] = useState<BurstEntry[]>([]);
+  const prevCompletingRef = useRef<Set<string>>(new Set());
 
   const positionMap = useMemo(() => {
     const rawPositions = tasks.map((task) => ({
@@ -70,6 +79,27 @@ function TaskNodes() {
     }));
     return applyOverlapAvoidance(rawPositions);
   }, [tasks]);
+
+  // Subscribe to store to detect new completions and spawn bursts
+  useEffect(() => {
+    if (!store) return;
+    const unsubscribe = store.subscribe((state) => {
+      const current = state.completingTaskIds;
+      const prev = prevCompletingRef.current;
+      // Find newly added IDs
+      current.forEach((id) => {
+        if (!prev.has(id)) {
+          // Look up the task position from positionMap
+          const pos = positionMap.get(id);
+          if (pos) {
+            setBursts((b) => [...b, { id, position: [pos.x, pos.y, pos.z] }]);
+          }
+        }
+      });
+      prevCompletingRef.current = new Set(current);
+    });
+    return unsubscribe;
+  }, [store, positionMap]);
 
   return (
     <>
@@ -84,6 +114,16 @@ function TaskNodes() {
           />
         );
       })}
+      {bursts.map((b) => (
+        <CompletionBurst
+          key={b.id}
+          position={b.position}
+          onComplete={() => {
+            setBursts((prev) => prev.filter((x) => x.id !== b.id));
+            store?.getState().finishCompletion(b.id);
+          }}
+        />
+      ))}
     </>
   );
 }

@@ -4,7 +4,7 @@ import { useState, useEffect, useContext } from 'react';
 import { Html } from '@react-three/drei';
 import type { Task } from '@/types/task';
 import { SCENE_CONSTANTS } from '@/lib/scene-constants';
-import { TaskStoreContext } from '@/stores/task-store';
+import { TaskStoreContext, useIsCompleting, useIsDropping } from '@/stores/task-store';
 
 interface TaskCardProps {
   task: Task;
@@ -14,6 +14,8 @@ interface TaskCardProps {
 
 export function TaskCard({ task, position, isNew }: TaskCardProps) {
   const store = useContext(TaskStoreContext);
+  const isCompleting = useIsCompleting(task.id);
+  const isDropping = useIsDropping(task.id);
   const hasDeadline = task.hardDeadline !== null;
   const isDrifted = task.driftCount > 0;
 
@@ -77,6 +79,21 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
     ...(isDrifted
       ? {
           filter: `saturate(${Math.max(0.3, 1 - task.driftCount * 0.15)})`,
+        }
+      : {}),
+    // Completion dissolution: fade + shrink
+    ...(isCompleting
+      ? {
+          opacity: 0,
+          transform: 'scale(0.5)',
+          transition: 'opacity 0.5s ease-out, transform 0.5s ease-out',
+        }
+      : {}),
+    // Drop dissolution: abrupt shrink, no fade
+    ...(isDropping
+      ? {
+          transform: 'scale(0)',
+          transition: 'transform 0.2s ease-in',
         }
       : {}),
   };

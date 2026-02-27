@@ -8,7 +8,7 @@ import * as THREE from 'three';
 import type { Task, TagCategory } from '@/types/task';
 import { TAG_COLORS } from '@/types/task';
 import { SCENE_CONSTANTS } from '@/lib/scene-constants';
-import { TaskStoreContext } from '@/stores/task-store';
+import { TaskStoreContext, useIsCompleting, useIsDropping } from '@/stores/task-store';
 
 // Default color when task has no tags or tag is not a recognized category
 const DEFAULT_COLOR = '#7c8db5';
@@ -31,11 +31,17 @@ export interface TaskSpriteProps {
 export function TaskSprite({ task, position, isNew }: TaskSpriteProps) {
   const store = useContext(TaskStoreContext);
   const invalidate = useThree((state) => state.invalidate);
+  const isCompleting = useIsCompleting(task.id);
+  const isDropping = useIsDropping(task.id);
 
   // Refs for entrance animation (direct mutation, no React re-renders)
   const groupRef = useRef<THREE.Group>(null);
   const materialRef = useRef<THREE.MeshBasicMaterial>(null);
   const mountTimeRef = useRef<number | null>(null);
+
+  // Refs for dissolution animations
+  const dissolvingRef = useRef<'completing' | 'dropping' | null>(null);
+  const dissolveStartRef = useRef<number | null>(null);
 
   // Derive glow color from first tag, shifted toward ethereal tones
   const glowColor = useMemo(() => {
@@ -60,10 +66,45 @@ export function TaskSprite({ task, position, isNew }: TaskSpriteProps) {
     );
   }, [task.driftCount]);
 
-  // Entrance animation via useFrame — only runs while isNew
-  useFrame((_state, _delta) => {
-    if (!isNew) return;
+  // Detect start of dissolution
+  if (isCompleting && dissolvingRef.current !== 'completing') {
+    dissolvingRef.current = 'completing';
+    dissolveStartRef.current = null;
+  }
+  if (isDropping && dissolvingRef.current !== 'dropping') {
+    dissolvingRef.current = 'dropping';
+    dissolveStartRef.current = null;
+  }
+
+  // Entrance + dissolution animation via useFrame
+  useFrame((_state, delta) => {
     if (!groupRef.current || !materialRef.current) return;
+
+    // Dissolution animation takes priority
+    if (dissolvingRef.current) {
+      if (dissolveStartRef.current === null) {
+        dissolveStartRef.current = 0;
+      }
+      dissolveStartRef.current += delta;
+      const elapsed = dissolveStartRef.current;
+
+      if (dissolvingRef.current === 'completing') {
+        // Fade + shrink over 0.5s
+        const t = Math.min(elapsed / 0.5, 1);
+        groupRef.current.scale.setScalar(1 - t);
+        materialRef.current.opacity = SCENE_CONSTANTS.spriteOpacity * (1 - t);
+      } else {
+        // Drop: rapid shrink over 0.2s, no opacity fade
+        const t = Math.min(elapsed / 0.2, 1);
+        groupRef.current.scale.setScalar(1 - t);
+      }
+
+      invalidate();
+      return;
+    }
+
+    // Entrance animation — only runs while isNew
+    if (!isNew) return;
 
     // Initialize mount time on first frame
     if (mountTimeRef.current === null) {
