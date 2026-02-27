@@ -34,11 +34,11 @@
 
 ### Task Interaction
 
-- [ ] **TASK-01**: User can click any task node (card or sprite) to open a TaskDetail panel as a 2D slide-in overlay
-- [ ] **TASK-02**: User can complete a task from the detail panel — task dissolves and fades from the scene with a satisfying animation
-- [ ] **TASK-03**: User can drop a task (guilt-free deletion) — distinct from complete, task disappears without ceremony
-- [ ] **TASK-04**: User can reschedule a task by changing its target date/horizon — task drifts to new Z-position
-- [ ] **TASK-05**: User can edit a task's title and details inline from the detail panel
+- [x] **TASK-01**: User can click any task node (card or sprite) to open a TaskDetail panel as a 2D slide-in overlay
+- [x] **TASK-02**: User can complete a task from the detail panel — task dissolves and fades from the scene with a satisfying animation
+- [x] **TASK-03**: User can drop a task (guilt-free deletion) — distinct from complete, task disappears without ceremony
+- [x] **TASK-04**: User can reschedule a task by changing its target date/horizon — task drifts to new Z-position
+- [x] **TASK-05**: User can edit a task's title and details inline from the detail panel
 
 ### Accountability
 
@@ -118,11 +118,11 @@
 | CAP-03 | Phase 5 | Complete |
 | CAP-04 | Phase 5 | Complete |
 | CAP-05 | Phase 5 | Complete |
-| TASK-01 | Phase 6 | Pending |
-| TASK-02 | Phase 6 | Pending |
-| TASK-03 | Phase 6 | Pending |
-| TASK-04 | Phase 6 | Pending |
-| TASK-05 | Phase 6 | Pending |
+| TASK-01 | Phase 6 | Complete |
+| TASK-02 | Phase 6 | Complete |
+| TASK-03 | Phase 6 | Complete |
+| TASK-04 | Phase 6 | Complete |
+| TASK-05 | Phase 6 | Complete |
 | ACCT-01 | Phase 7 | Pending |
 | ACCT-02 | Phase 7 | Pending |
 | ACCT-03 | Phase 7 | Pending |
