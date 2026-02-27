@@ -44,6 +44,14 @@ export const SCENE_CONSTANTS = {
   zSmoothTime: 0.25,          // smoothTime for damp3 on Z-axis (lower = snappier)
   zUnitsPerPixel: 0.08,       // Scroll delta multiplier (~5-8 z-units per normal tick)
   springBackSmoothTime: 0.15, // Faster smoothTime for spring-back from overscroll
+
+  // Parallax
+  parallaxMaxX: 0.8,          // Max X camera shift at full mouse offset (~0.5-1 unit subtle)
+  parallaxMaxY: 0.5,          // Max Y camera shift (slightly less than X)
+  parallaxSmoothTime: 0.3,    // smoothTime for parallax damping (floaty feel)
+
+  // Snap-to-present
+  snapDistanceThreshold: 1.5, // Z distance from cameraRestZ before snap button appears
 } as const;
 
 export type SceneConstants = typeof SCENE_CONSTANTS;

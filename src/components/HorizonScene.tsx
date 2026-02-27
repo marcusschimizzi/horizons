@@ -12,6 +12,7 @@ import { getTaskPosition, applyOverlapAvoidance } from '@/lib/spatial';
 import { TaskNode } from './TaskNode';
 import { CameraRig } from './CameraRig';
 import { DebugOverlay } from './DebugOverlay';
+import { SnapToPresent } from './SnapToPresent';
 
 // O(1) lookup for card horizons (same set as TaskNode, used for breakdown count)
 const cardHorizonsSet = new Set<string>(SCENE_CONSTANTS.cardHorizons);
@@ -144,6 +145,7 @@ export default function HorizonScene() {
       >
         <SceneContents />
       </Canvas>
+      <SnapToPresent />
       <DebugOverlay taskBreakdown={taskBreakdown} />
     </>
   );
