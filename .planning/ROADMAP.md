@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation** - Next.js scaffold, DB schema, Drizzle migrations, shared types, horizon math library
 - [x] **Phase 2: Data Layer** - CRUD API routes, seed data, Zustand store, SceneLoader client boundary
 - [x] **Phase 3: 3D Scene** - Canvas, fog, atmosphere, TaskNodes with LOD (card + sprite), visual system
-- [ ] **Phase 4: Camera** - Scroll Z-axis movement, easing/momentum, limits, snap-to-present, mouse parallax
+- [x] **Phase 4: Camera** - Scroll Z-axis movement, easing/momentum, limits, snap-to-present, mouse parallax
 - [ ] **Phase 5: Capture** - Natural language input bubble, Haiku parse route, persistence, entrance animation
 - [ ] **Phase 6: Task Interactions** - TaskDetail panel, complete/drop/reschedule/edit with animations
 - [ ] **Phase 7: Polish** - Accountability/drift tracking, refinement flow, list view, bloom tuning

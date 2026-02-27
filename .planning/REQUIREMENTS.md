@@ -108,11 +108,11 @@
 | SCENE-04 | Phase 3 | Pending |
 | SCENE-05 | Phase 3 | Pending |
 | SCENE-06 | Phase 3 | Pending |
-| CAM-01 | Phase 4 | Pending |
-| CAM-02 | Phase 4 | Pending |
-| CAM-03 | Phase 4 | Pending |
-| CAM-04 | Phase 4 | Pending |
-| CAM-05 | Phase 4 | Pending |
+| CAM-01 | Phase 4 | Complete |
+| CAM-02 | Phase 4 | Complete |
+| CAM-03 | Phase 4 | Complete |
+| CAM-04 | Phase 4 | Complete |
+| CAM-05 | Phase 4 | Complete |
 | CAP-01 | Phase 5 | Pending |
 | CAP-02 | Phase 5 | Pending |
 | CAP-03 | Phase 5 | Pending |
