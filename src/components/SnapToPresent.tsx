@@ -20,7 +20,7 @@ export function SnapToPresent() {
 
   const containerStyle: React.CSSProperties = {
     position: 'fixed',
-    bottom: 24,
+    bottom: 88,
     left: '50%',
     transform: isAway ? 'translateX(-50%) translateY(0)' : 'translateX(-50%) translateY(8px)',
     zIndex: 100,
