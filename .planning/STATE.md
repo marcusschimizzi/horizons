@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-26)
 ## Current Position
 
 Phase: 3 of 7 (3D Scene)
-Plan: 2 of 4 in current phase
+Plan: 3 of 4 in current phase
 Status: In progress
-Last activity: 2026-02-27 — Completed 03-02-PLAN.md
+Last activity: 2026-02-27 — Completed 03-03-PLAN.md
 
-Progress: [██████████████░░░░░░] ~33% (7 plans of ~21 estimated total)
+Progress: [███████████████░░░░░] ~43% (9 plans of ~21 estimated total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
+- Total plans completed: 9
 - Average duration: 3 min
-- Total execution time: 22 min
+- Total execution time: 23 min
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [██████████████░░░░░░] ~33% (7
 |-------|-------|-------|----------|
 | 01-foundation | 3/3 | 10 min | 3 min |
 | 02-data-layer | 2/2 | 9 min | 5 min |
-| 03-3d-scene | 2/4 | 3 min | 2 min |
+| 03-3d-scene | 3/4 | 4 min | 1 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (5 min), 02-02 (4 min), 03-01 (2 min), 03-02 (1 min)
+- Last 5 plans: 02-02 (4 min), 03-01 (2 min), 03-02 (1 min), 03-03 (1 min)
 - Trend: accelerating
 
 *Updated after each plan completion*
@@ -70,6 +70,8 @@ Recent decisions affecting current work:
 - TaskStoreContext exported from task-store.tsx for SceneInvalidator direct store subscription
 - TaskSprite default color #7c8db5 for untagged tasks, ethereal lerp(#c8d6e5, 0.25) for starlight feel
 - DriftCount size scaling capped at 5 drifts (max ~30% radius increase)
+- Inline styles only for drei Html components (not Tailwind) — drei Html renders outside normal DOM
+- WebkitBackdropFilter included for Safari backdrop-filter compatibility
 
 ### Pending Todos
 
@@ -85,5 +87,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 03-02-PLAN.md (TaskSprite billboard with emissive glow and tag-based coloring)
+Stopped at: Completed 03-03-PLAN.md (TaskCard frosted-glass drei Html card with deadline ring and drift indicator)
 Resume file: None
