@@ -161,4 +161,4 @@ function useTasksByHorizon(): Map<Horizon, Task[]> {
 // Exports
 // ---------------------------------------------------------------------------
 
-export { TaskStoreProvider, useTaskStore, useTasksWithHorizon, useTasksByHorizon };
+export { TaskStoreContext, TaskStoreProvider, useTaskStore, useTasksWithHorizon, useTasksByHorizon };
