@@ -1,10 +1,11 @@
 import { NextRequest } from 'next/server';
+import { eq } from 'drizzle-orm';
 import { db } from '@/db';
 import { tasks } from '@/db/schema';
 
 export async function GET() {
   try {
-    const allTasks = await db.select().from(tasks);
+    const allTasks = await db.select().from(tasks).where(eq(tasks.status, 'active'));
     return Response.json(allTasks);
   } catch {
     return Response.json(

@@ -1,6 +1,8 @@
 'use client';
 
-import { useSelectedTask, useTaskStore } from '@/stores/task-store';
+import { useRef, useState, useEffect, useCallback, useContext } from 'react';
+import { useSelectedTask, useTaskStore, TaskStoreContext } from '@/stores/task-store';
+import type { TaskRow } from '@/types/task';
 
 const HORIZON_LABELS: Record<string, string> = {
   'immediate': 'Immediate',
@@ -20,10 +22,122 @@ const HORIZON_COLORS: Record<string, string> = {
   'someday': '#64748b',
 };
 
+type ActionResult = 'completed' | 'dropped' | null;
+
 export function TaskDetail() {
   const task = useSelectedTask();
+  const store = useContext(TaskStoreContext);
   const clearSelection = useTaskStore((s) => s.clearSelection);
   const isOpen = task !== null;
+
+  const [undoPending, setUndoPending] = useState(false);
+  const [actionResult, setActionResult] = useState<ActionResult>(null);
+  const persistTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const closePanelTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const undoTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const snapshotRef = useRef<TaskRow | null>(null);
+
+  // Reset state when panel closes or task changes
+  useEffect(() => {
+    if (!isOpen) {
+      setUndoPending(false);
+      setActionResult(null);
+    }
+  }, [isOpen]);
+
+  // Cleanup timeouts on unmount
+  useEffect(() => {
+    return () => {
+      if (persistTimeoutRef.current) clearTimeout(persistTimeoutRef.current);
+      if (closePanelTimeoutRef.current) clearTimeout(closePanelTimeoutRef.current);
+      if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+    };
+  }, []);
+
+  const handleComplete = useCallback(() => {
+    if (!store || !task) return;
+    const state = store.getState();
+    const taskRow = state.tasks.find((t) => t.id === task.id);
+    if (!taskRow) return;
+
+    // Snapshot for potential undo
+    snapshotRef.current = { ...taskRow };
+
+    // Trigger dissolution animation
+    state.startCompletion(task.id);
+    setActionResult('completed');
+    setUndoPending(true);
+
+    // Schedule PATCH after 4 seconds (allows undo window)
+    persistTimeoutRef.current = setTimeout(() => {
+      fetch(`/api/tasks/${task.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'completed' }),
+      }).catch(() => {
+        // PATCH failed -- restore the task
+        if (snapshotRef.current) {
+          store.getState().restoreTask(snapshotRef.current);
+        }
+      });
+      setUndoPending(false);
+    }, 4000);
+
+    // Auto-hide undo toast after 4s
+    undoTimerRef.current = setTimeout(() => {
+      setUndoPending(false);
+    }, 4000);
+
+    // Close panel after 1s
+    closePanelTimeoutRef.current = setTimeout(() => {
+      store.getState().clearSelection();
+    }, 1000);
+  }, [store, task]);
+
+  const handleUndo = useCallback(() => {
+    if (!store || !snapshotRef.current) return;
+
+    // Cancel the pending PATCH
+    if (persistTimeoutRef.current) clearTimeout(persistTimeoutRef.current);
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+    if (closePanelTimeoutRef.current) clearTimeout(closePanelTimeoutRef.current);
+
+    const snapshot = snapshotRef.current;
+    store.getState().cancelCompletion(snapshot.id);
+    store.getState().restoreTask(snapshot);
+    setUndoPending(false);
+    setActionResult(null);
+    snapshotRef.current = null;
+  }, [store]);
+
+  const handleDrop = useCallback(() => {
+    if (!store || !task) return;
+
+    // Trigger shrink animation
+    store.getState().startDrop(task.id);
+    setActionResult('dropped');
+
+    // Immediately persist
+    fetch(`/api/tasks/${task.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: 'dropped' }),
+    }).catch(() => {
+      // Best effort -- already removed from UI
+    });
+
+    // Remove from store after shrink animation
+    setTimeout(() => {
+      store.getState().finishDrop(task.id);
+    }, 300);
+
+    // Close panel after 1s
+    closePanelTimeoutRef.current = setTimeout(() => {
+      store.getState().clearSelection();
+    }, 1000);
+  }, [store, task]);
+
+  // --- Styles ---
 
   const panelStyle: React.CSSProperties = {
     position: 'fixed',
@@ -178,6 +292,50 @@ export function TaskDetail() {
     border: '1px solid rgba(59, 130, 246, 0.3)',
   };
 
+  const overlayStyle: React.CSSProperties = {
+    position: 'absolute',
+    inset: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    background: 'rgba(10, 10, 15, 0.85)',
+    zIndex: 1,
+    gap: 8,
+  };
+
+  const toastStyle: React.CSSProperties = {
+    position: 'fixed',
+    bottom: 80,
+    left: '50%',
+    transform: 'translateX(-50%)',
+    zIndex: 130,
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+    padding: '10px 18px',
+    background: 'rgba(20, 20, 30, 0.9)',
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
+    border: '1px solid rgba(148, 163, 184, 0.2)',
+    borderRadius: 24,
+    fontFamily: 'monospace',
+    fontSize: 13,
+    color: '#e2e8f0',
+  };
+
+  const undoBtnStyle: React.CSSProperties = {
+    background: 'none',
+    border: '1px solid rgba(34, 197, 94, 0.4)',
+    borderRadius: 6,
+    color: '#22c55e',
+    fontSize: 12,
+    fontWeight: 600,
+    fontFamily: 'monospace',
+    padding: '4px 10px',
+    cursor: 'pointer',
+  };
+
   const horizonColor = task ? (HORIZON_COLORS[task.horizon] || '#64748b') : '#64748b';
   const horizonLabel = task ? (HORIZON_LABELS[task.horizon] || task.horizon) : '';
 
@@ -187,6 +345,21 @@ export function TaskDetail() {
       <div style={panelStyle}>
         {task && (
           <>
+            {/* Success overlay for completed */}
+            {actionResult === 'completed' && (
+              <div style={overlayStyle}>
+                <span style={{ fontSize: 32 }}>&#10003;</span>
+                <span style={{ fontSize: 16, fontWeight: 600, color: '#22c55e' }}>Done</span>
+              </div>
+            )}
+
+            {/* Success overlay for dropped */}
+            {actionResult === 'dropped' && (
+              <div style={overlayStyle}>
+                <span style={{ fontSize: 14, color: '#64748b' }}>Task dropped</span>
+              </div>
+            )}
+
             <div style={headerStyle}>
               <input
                 style={titleInputStyle}
@@ -216,19 +389,22 @@ export function TaskDetail() {
             <div style={actionBarStyle}>
               <button
                 style={completeBtnStyle}
-                onClick={() => console.log('complete', task.id)}
+                onClick={handleComplete}
+                disabled={actionResult !== null}
               >
                 Complete
               </button>
               <button
                 style={dropBtnStyle}
-                onClick={() => console.log('drop', task.id)}
+                onClick={handleDrop}
+                disabled={actionResult !== null}
               >
                 Drop
               </button>
               <button
                 style={rescheduleBtnStyle}
                 onClick={() => console.log('reschedule', task.id)}
+                disabled={actionResult !== null}
               >
                 Reschedule
               </button>
@@ -236,6 +412,16 @@ export function TaskDetail() {
           </>
         )}
       </div>
+
+      {/* Undo toast */}
+      {undoPending && (
+        <div style={toastStyle}>
+          <span>Task completed</span>
+          <button style={undoBtnStyle} onClick={handleUndo}>
+            Undo
+          </button>
+        </div>
+      )}
     </>
   );
 }
