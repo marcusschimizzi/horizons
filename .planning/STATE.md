@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-26)
 ## Current Position
 
 Phase: 1 of 7 (Foundation)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-02-27 — Completed 01-01-PLAN.md
+Last activity: 2026-02-27 — Completed 01-02-PLAN.md
 
-Progress: [███░░░░░░░] ~5% (1 plan of ~20 estimated total)
+Progress: [██████░░░░] ~10% (2 plans of ~20 estimated total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 4 min
-- Total execution time: 4 min
+- Total plans completed: 2
+- Average duration: 3 min
+- Total execution time: 6 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-foundation | 1/3 | 4 min | 4 min |
+| 01-foundation | 2/3 | 6 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (4 min)
-- Trend: baseline
+- Last 5 plans: 01-01 (4 min), 01-02 (2 min)
+- Trend: improving
 
 *Updated after each plan completion*
 
@@ -50,6 +50,10 @@ Recent decisions affecting current work:
 - three@0.170.0 pinned via npm overrides to prevent duplicate bundles
 - Docker Compose Postgres on port 5435 (5432 occupied by existing container)
 - Next.js 16.1.6 installed (create-next-app@latest now generates v16, compatible with all deps)
+- globalThis singleton pattern for DB Pool to prevent HMR connection exhaustion
+- SSL enabled only in production (rejectUnauthorized: false for Railway self-signed certs)
+- cuid2 text primary keys via $defaultFn in Drizzle schema
+- Pool max connections set to 10
 
 ### Pending Todos
 
@@ -65,5 +69,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 01-01-PLAN.md (project scaffold)
+Stopped at: Completed 01-02-PLAN.md (database layer)
 Resume file: None
