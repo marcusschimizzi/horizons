@@ -1,7 +1,13 @@
-export default function Home() {
-  return (
-    <main className="flex min-h-screen items-center justify-center">
-      <h1 className="text-4xl font-bold text-text-primary">Horizon</h1>
-    </main>
-  );
+import { db } from '@/db';
+import { tasks } from '@/db/schema';
+import SceneLoader from '@/components/SceneLoader';
+
+export default async function Home() {
+  try {
+    const allTasks = await db.select().from(tasks);
+    return <SceneLoader initialTasks={allTasks} />;
+  } catch (e) {
+    console.error('Failed to fetch tasks:', e);
+    return <SceneLoader initialTasks={[]} error />;
+  }
 }
