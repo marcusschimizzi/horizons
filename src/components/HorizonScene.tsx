@@ -14,6 +14,7 @@ import { CameraRig } from './CameraRig';
 import { DebugOverlay } from './DebugOverlay';
 import { SnapToPresent } from './SnapToPresent';
 import { InputBubble } from './InputBubble';
+import { TaskDetail } from './TaskDetail';
 
 // O(1) lookup for card horizons (same set as TaskNode, used for breakdown count)
 const cardHorizonsSet = new Set<string>(SCENE_CONSTANTS.cardHorizons);
@@ -148,6 +149,7 @@ export default function HorizonScene() {
       </Canvas>
       <SnapToPresent />
       <InputBubble />
+      <TaskDetail />
       <DebugOverlay taskBreakdown={taskBreakdown} />
     </>
   );
