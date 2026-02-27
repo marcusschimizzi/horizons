@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-26)
 ## Current Position
 
 Phase: 1 of 7 (Foundation)
-Plan: 0 of 3 in current phase
-Status: Ready to plan
-Last activity: 2026-02-26 — Roadmap and STATE.md created
+Plan: 1 of 3 in current phase
+Status: In progress
+Last activity: 2026-02-27 — Completed 01-01-PLAN.md
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [███░░░░░░░] ~5% (1 plan of ~20 estimated total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: —
-- Total execution time: 0 hours
+- Total plans completed: 1
+- Average duration: 4 min
+- Total execution time: 4 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 01-foundation | 1/3 | 4 min | 4 min |
 
 **Recent Trend:**
-- Last 5 plans: —
-- Trend: —
+- Last 5 plans: 01-01 (4 min)
+- Trend: baseline
 
 *Updated after each plan completion*
 
@@ -42,15 +42,18 @@ Progress: [░░░░░░░░░░] 0%
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- Stack locked: Next.js 15 App Router, R3F 8, Drizzle 0.38, Zustand 5, Railway Postgres
+- Stack locked: Next.js 16 App Router, R3F 9.5.0, Drizzle 0.45.1, Zustand 5, Railway Postgres
 - Canvas must use `dynamic(ssr: false)` — not just `"use client"` — or the build crashes
 - Zustand store must never be imported by Server Components — hard module boundary required
 - `horizon` is NOT a DB column — computed client-side from `targetDate` + `now` every render
 - Railway Postgres over Neon — simpler setup, persistent Node server, one dashboard
+- three@0.170.0 pinned via npm overrides to prevent duplicate bundles
+- Docker Compose Postgres on port 5435 (5432 occupied by existing container)
+- Next.js 16.1.6 installed (create-next-app@latest now generates v16, compatible with all deps)
 
 ### Pending Todos
 
-None yet.
+None.
 
 ### Blockers/Concerns
 
@@ -61,6 +64,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-26
-Stopped at: Roadmap created, ready to begin Phase 1 planning
+Last session: 2026-02-27
+Stopped at: Completed 01-01-PLAN.md (project scaffold)
 Resume file: None
