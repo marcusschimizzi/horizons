@@ -5,33 +5,33 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** The spatial view must make you feel your future — if the 3D scene doesn't feel meaningfully different from a list, nothing else matters.
-**Current focus:** Phase 1 — Foundation
+**Current focus:** Phase 1 -- Foundation (COMPLETE)
 
 ## Current Position
 
 Phase: 1 of 7 (Foundation)
-Plan: 2 of 3 in current phase
-Status: In progress
-Last activity: 2026-02-27 — Completed 01-02-PLAN.md
+Plan: 3 of 3 in current phase
+Status: Phase complete
+Last activity: 2026-02-27 — Completed 01-03-PLAN.md
 
-Progress: [██████░░░░] ~10% (2 plans of ~20 estimated total)
+Progress: [███████░░░░░░░░░░░░░] ~15% (3 plans of ~20 estimated total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
+- Total plans completed: 3
 - Average duration: 3 min
-- Total execution time: 6 min
+- Total execution time: 10 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-foundation | 2/3 | 6 min | 3 min |
+| 01-foundation | 3/3 | 10 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (4 min), 01-02 (2 min)
-- Trend: improving
+- Last 5 plans: 01-01 (4 min), 01-02 (2 min), 01-03 (4 min)
+- Trend: stable
 
 *Updated after each plan completion*
 
@@ -54,6 +54,9 @@ Recent decisions affecting current work:
 - SSL enabled only in production (rejectUnauthorized: false for Railway self-signed certs)
 - cuid2 text primary keys via $defaultFn in Drizzle schema
 - Pool max connections set to 10
+- Boundary values (1, 7, 30, 90, 365 days) inclusive to nearer horizon (<=)
+- Past/overdue dates clamp to 'immediate' horizon
+- Vitest for testing with TDD red-green-refactor workflow
 
 ### Pending Todos
 
@@ -69,5 +72,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 01-02-PLAN.md (database layer)
+Stopped at: Completed 01-03-PLAN.md (horizon math and spatial positioning — Phase 1 complete)
 Resume file: None
