@@ -51,6 +51,29 @@ export function TaskDetail() {
   const undoTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const snapshotRef = useRef<TaskRow | null>(null);
 
+  // --- Inline editing state ---
+  const [localTitle, setLocalTitle] = useState('');
+  const [localRawInput, setLocalRawInput] = useState('');
+  const titleDirtyRef = useRef(false);
+  const rawInputDirtyRef = useRef(false);
+  const titleDebounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const rawInputDebounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const prevTaskIdRef = useRef<string | null>(null);
+
+  // Sync local state when task changes (keyed on task.id, not task.title/rawInput)
+  useEffect(() => {
+    if (task && task.id !== prevTaskIdRef.current) {
+      setLocalTitle(task.title);
+      setLocalRawInput(task.rawInput);
+      titleDirtyRef.current = false;
+      rawInputDirtyRef.current = false;
+      prevTaskIdRef.current = task.id;
+    }
+    if (!task) {
+      prevTaskIdRef.current = null;
+    }
+  }, [task]);
+
   // Reset state when panel closes or task changes
   useEffect(() => {
     if (!isOpen) {
@@ -65,8 +88,64 @@ export function TaskDetail() {
       if (persistTimeoutRef.current) clearTimeout(persistTimeoutRef.current);
       if (closePanelTimeoutRef.current) clearTimeout(closePanelTimeoutRef.current);
       if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+      if (titleDebounceRef.current) clearTimeout(titleDebounceRef.current);
+      if (rawInputDebounceRef.current) clearTimeout(rawInputDebounceRef.current);
     };
   }, []);
+
+  // --- Title auto-save ---
+  const saveTitle = useCallback((value: string) => {
+    if (!store || !task) return;
+    titleDirtyRef.current = false;
+    store.getState().updateTask(task.id, { title: value });
+    fetch(`/api/tasks/${task.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title: value }),
+    }).catch(() => { /* best effort */ });
+  }, [store, task]);
+
+  const handleTitleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setLocalTitle(value);
+    titleDirtyRef.current = true;
+    if (titleDebounceRef.current) clearTimeout(titleDebounceRef.current);
+    titleDebounceRef.current = setTimeout(() => {
+      if (titleDirtyRef.current) saveTitle(value);
+    }, 1000);
+  }, [saveTitle]);
+
+  const handleTitleBlur = useCallback(() => {
+    if (titleDebounceRef.current) clearTimeout(titleDebounceRef.current);
+    if (titleDirtyRef.current) saveTitle(localTitle);
+  }, [saveTitle, localTitle]);
+
+  // --- RawInput auto-save ---
+  const saveRawInput = useCallback((value: string) => {
+    if (!store || !task) return;
+    rawInputDirtyRef.current = false;
+    store.getState().updateTask(task.id, { rawInput: value });
+    fetch(`/api/tasks/${task.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rawInput: value }),
+    }).catch(() => { /* best effort */ });
+  }, [store, task]);
+
+  const handleRawInputChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    setLocalRawInput(value);
+    rawInputDirtyRef.current = true;
+    if (rawInputDebounceRef.current) clearTimeout(rawInputDebounceRef.current);
+    rawInputDebounceRef.current = setTimeout(() => {
+      if (rawInputDirtyRef.current) saveRawInput(value);
+    }, 1000);
+  }, [saveRawInput]);
+
+  const handleRawInputBlur = useCallback(() => {
+    if (rawInputDebounceRef.current) clearTimeout(rawInputDebounceRef.current);
+    if (rawInputDirtyRef.current) saveRawInput(localRawInput);
+  }, [saveRawInput, localRawInput]);
 
   const handleComplete = useCallback(() => {
     if (!store || !task) return;
@@ -440,8 +519,9 @@ export function TaskDetail() {
             <div style={headerStyle}>
               <input
                 style={titleInputStyle}
-                value={task.title}
-                readOnly
+                value={localTitle}
+                onChange={handleTitleChange}
+                onBlur={handleTitleBlur}
               />
               <button style={closeBtnStyle} onClick={clearSelection}>
                 X
@@ -459,8 +539,9 @@ export function TaskDetail() {
 
             <textarea
               style={textareaStyle}
-              value={task.rawInput}
-              readOnly
+              value={localRawInput}
+              onChange={handleRawInputChange}
+              onBlur={handleRawInputBlur}
             />
 
             <div style={rescheduleSectionStyle}>
