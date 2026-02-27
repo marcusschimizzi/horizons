@@ -145,13 +145,17 @@ export function InputBubble() {
     // Step 6: Show toast
     showToast(parsed.title, horizonLabel);
 
-    // Step 7: Camera pan if horizon is out of view
-    const horizonZ = getZDepth(horizon);
-    const { currentZ } = cameraStore.getState();
-    const isVisible = horizonZ <= currentZ && horizonZ >= currentZ - 15;
-    if (!isVisible) {
-      const targetZ = Math.max(horizonZ + 7.5, SCENE_CONSTANTS.farBoundary);
-      cameraStore.setState({ targetZ, velocity: 0, isAnimating: true });
+    // Step 7: Camera pan if horizon is out of view.
+    // Skip 'someday' — it's 100+ Z-units away and flying there always feels like a teleport.
+    // The toast is sufficient feedback for a vague far-future task.
+    if (horizon !== 'someday') {
+      const horizonZ = getZDepth(horizon);
+      const { currentZ } = cameraStore.getState();
+      const isVisible = horizonZ <= currentZ && horizonZ >= currentZ - 15;
+      if (!isVisible) {
+        const targetZ = Math.max(horizonZ + 7.5, SCENE_CONSTANTS.farBoundary);
+        cameraStore.setState({ targetZ, velocity: 0, isAnimating: true });
+      }
     }
 
     // Step 8: Background persist (fire and forget)
