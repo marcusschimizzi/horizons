@@ -5,7 +5,7 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** The spatial view must make you feel your future — if the 3D scene doesn't feel meaningfully different from a list, nothing else matters.
-**Current focus:** Phase 1 -- Foundation (COMPLETE)
+**Current focus:** Phase 2 — Data Layer
 
 ## Current Position
 

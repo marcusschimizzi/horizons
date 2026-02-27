@@ -4,7 +4,6 @@ import {
   getZDepth,
   getZDepthRange,
   HORIZON_BANDS,
-  type Horizon,
 } from '@/lib/horizons';
 import type { DateRange } from '@/types/task';
 
