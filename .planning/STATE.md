@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-26)
 ## Current Position
 
 Phase: 5 of 7 (Capture)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-02-27 — Completed 05-01-PLAN.md
+Last activity: 2026-02-27 — Completed 05-02-PLAN.md
 
-Progress: [█████████████████████░░] ~57% (12 plans of ~21 estimated total)
+Progress: [██████████████████████░░] ~62% (13 plans of ~21 estimated total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
+- Total plans completed: 14
 - Average duration: 2 min
-- Total execution time: 31 min
+- Total execution time: 33 min
 
 **By Phase:**
 
@@ -31,10 +31,10 @@ Progress: [█████████████████████░░
 | 02-data-layer | 2/2 | 9 min | 5 min |
 | 03-3d-scene | 4/4 | 5 min | 1 min |
 | 04-camera | 2/2 | 5 min | 3 min |
-| 05-capture | 1/3 | 2 min | 2 min |
+| 05-capture | 2/3 | 4 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-04 (1 min), 04-01 (2 min), 04-02 (3 min), 05-01 (2 min)
+- Last 5 plans: 04-01 (2 min), 04-02 (3 min), 05-01 (2 min), 05-02 (2 min)
 - Trend: consistent
 
 *Updated after each plan completion*
@@ -85,6 +85,9 @@ Recent decisions affecting current work:
 - DOM-to-Canvas invalidation bridge via cameraStore.subscribe in CameraRig — triggers invalidate() when isAnimating becomes true
 - InputBubble z-index 110 above SnapToPresent z-index 100, SnapToPresent repositioned to bottom:88
 - Injected style tag for CSS keyframes in inline-style-only overlay components
+- zodOutputFormat with messages.parse() for guaranteed schema-compliant AI extraction (no retry logic)
+- Module-level Anthropic client singleton in route handler (reused across requests)
+- System prompt includes dynamic today date for relative date resolution
 
 ### Pending Todos
 
@@ -92,12 +95,12 @@ None.
 
 ### Blockers/Concerns
 
-- Two open architecture questions to resolve during future phase planning:
-  - Haiku JSON reliability — tool use vs raw JSON in `/api/parse`? Decide before building Phase 5 Plan 02.
+- One open architecture question to resolve during future phase planning:
   - Drift increment trigger — RSC on-load check (simplest) vs cron vs client mount. Decide before Phase 7.
+- RESOLVED: Haiku JSON reliability — using zodOutputFormat with messages.parse() (GA in SDK 0.78.0). No fallback to tool use needed.
 
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 05-01-PLAN.md (InputBubble UI shell created and wired into HorizonScene)
+Stopped at: Completed 05-02-PLAN.md (Haiku parse endpoint with zodOutputFormat structured extraction)
 Resume file: None
