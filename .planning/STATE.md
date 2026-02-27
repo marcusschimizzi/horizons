@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** The spatial view must make you feel your future — if the 3D scene doesn't feel meaningfully different from a list, nothing else matters.
-**Current focus:** Phase 3 — 3D Scene
+**Current focus:** Phase 3 — 3D Scene (COMPLETE)
 
 ## Current Position
 
 Phase: 3 of 7 (3D Scene)
-Plan: 3 of 4 in current phase
-Status: In progress
-Last activity: 2026-02-27 — Completed 03-03-PLAN.md
+Plan: 4 of 4 in current phase
+Status: Phase complete
+Last activity: 2026-02-27 — Completed 03-04-PLAN.md
 
-Progress: [███████████████░░░░░] ~43% (9 plans of ~21 estimated total)
+Progress: [███████████████████░] ~48% (10 plans of ~21 estimated total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
-- Average duration: 3 min
-- Total execution time: 23 min
+- Total plans completed: 10
+- Average duration: 2 min
+- Total execution time: 24 min
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [███████████████░░░░░] ~43% (9
 |-------|-------|-------|----------|
 | 01-foundation | 3/3 | 10 min | 3 min |
 | 02-data-layer | 2/2 | 9 min | 5 min |
-| 03-3d-scene | 3/4 | 4 min | 1 min |
+| 03-3d-scene | 4/4 | 5 min | 1 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-02 (4 min), 03-01 (2 min), 03-02 (1 min), 03-03 (1 min)
+- Last 5 plans: 03-01 (2 min), 03-02 (1 min), 03-03 (1 min), 03-04 (1 min)
 - Trend: accelerating
 
 *Updated after each plan completion*
@@ -72,6 +72,9 @@ Recent decisions affecting current work:
 - DriftCount size scaling capped at 5 drifts (max ~30% radius increase)
 - Inline styles only for drei Html components (not Tailwind) — drei Html renders outside normal DOM
 - WebkitBackdropFilter included for Safari backdrop-filter compatibility
+- Categorical LOD split using Set lookup on cardHorizons, not camera distance
+- DebugOverlay rendered as sibling to Canvas (plain DOM), not inside R3F
+- TaskNode isCard variable kept explicit for Phase 4 hysteresis extension
 
 ### Pending Todos
 
@@ -79,13 +82,13 @@ None.
 
 ### Blockers/Concerns
 
-- Three open architecture questions to resolve during Phase 2-3 planning:
-  - LOD distance threshold — at what Z-depth does TaskCard flip to TaskSprite? Expose debug slider during Phase 3.
+- Two open architecture questions to resolve during future phase planning:
   - Haiku JSON reliability — tool use vs raw JSON in `/api/parse`? Decide before building Phase 5.
   - Drift increment trigger — RSC on-load check (simplest) vs cron vs client mount. Decide before Phase 7.
+- LOD distance threshold question resolved: categorical horizon-based split (no distance calc needed for Phase 3; Phase 4 may add camera-distance hysteresis)
 
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 03-03-PLAN.md (TaskCard frosted-glass drei Html card with deadline ring and drift indicator)
+Stopped at: Completed 03-04-PLAN.md (Phase 3 complete — TaskNode LOD integration with DebugOverlay)
 Resume file: None
