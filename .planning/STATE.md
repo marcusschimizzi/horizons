@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-26)
 ## Current Position
 
 Phase: 6 of 7 (Task Interactions) — In progress
-Plan: 1 of 3 in phase 6 complete
+Plan: 2 of 3 in phase 6 complete
 Status: In progress
-Last activity: 2026-02-27 — Completed 06-01-PLAN.md
+Last activity: 2026-02-27 — Completed 06-02-PLAN.md
 
-Progress: [████████████████████████░░] ~71% (15 plans of ~21 estimated total)
+Progress: [█████████████████████████░] ~76% (16 plans of ~21 estimated total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15
+- Total plans completed: 16
 - Average duration: 2 min
-- Total execution time: 35 min
+- Total execution time: 39 min
 
 **By Phase:**
 
@@ -32,10 +32,10 @@ Progress: [███████████████████████
 | 03-3d-scene | 4/4 | 5 min | 1 min |
 | 04-camera | 2/2 | 5 min | 3 min |
 | 05-capture | 3/3 | ~20 min | ~7 min |
-| 06-task-interactions | 1/3 | 2 min | 2 min |
+| 06-task-interactions | 2/3 | 6 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 04-02 (3 min), 05-01 (2 min), 05-02 (2 min), 06-01 (2 min)
+- Last 5 plans: 05-01 (2 min), 05-02 (2 min), 06-01 (2 min), 06-02 (4 min)
 - Trend: consistent
 
 *Updated after each plan completion*
@@ -92,6 +92,11 @@ Recent decisions affecting current work:
 - TaskDetail z-index 120 (panel) / 119 (backdrop) above InputBubble 110 and SnapToPresent 100
 - Panel always in DOM with CSS transform toggle for smooth slide-in (no mount/unmount)
 - Action buttons (Complete, Drop, Reschedule) are stubs in 06-01 — wiring deferred to 06-02
+- 4-second undo window before completion PATCH persists to server
+- Drop has no undo — immediate PATCH, instant shrink, clinical feel (emotionally distinct from complete)
+- CompletionBurst uses delta-based timing for R3F demand frameloop compatibility
+- Optimistic removal pattern: startCompletion -> animation -> finishCompletion -> removeTask
+- Undo toast z-index 130 (above TaskDetail panel 120)
 
 ### Pending Todos
 
@@ -106,5 +111,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 06-01-PLAN.md (click-to-panel foundation)
+Stopped at: Completed 06-02-PLAN.md (Complete/Drop actions with animations and persistence)
 Resume file: None
