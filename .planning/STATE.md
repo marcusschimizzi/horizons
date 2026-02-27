@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-26)
 ## Current Position
 
 Phase: 3 of 7 (3D Scene)
-Plan: 1 of 4 in current phase
+Plan: 2 of 4 in current phase
 Status: In progress
-Last activity: 2026-02-27 — Completed 03-01-PLAN.md
+Last activity: 2026-02-27 — Completed 03-02-PLAN.md
 
-Progress: [██████████░░░░░░░░░░] ~29% (6 plans of ~21 estimated total)
+Progress: [██████████████░░░░░░] ~33% (7 plans of ~21 estimated total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: 4 min
-- Total execution time: 21 min
+- Total plans completed: 7
+- Average duration: 3 min
+- Total execution time: 22 min
 
 **By Phase:**
 
@@ -29,11 +29,11 @@ Progress: [██████████░░░░░░░░░░] ~29% (6
 |-------|-------|-------|----------|
 | 01-foundation | 3/3 | 10 min | 3 min |
 | 02-data-layer | 2/2 | 9 min | 5 min |
-| 03-3d-scene | 1/4 | 2 min | 2 min |
+| 03-3d-scene | 2/4 | 3 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-03 (4 min), 02-01 (5 min), 02-02 (4 min), 03-01 (2 min)
-- Trend: stable
+- Last 5 plans: 02-01 (5 min), 02-02 (4 min), 03-01 (2 min), 03-02 (1 min)
+- Trend: accelerating
 
 *Updated after each plan completion*
 
@@ -68,6 +68,8 @@ Recent decisions affecting current work:
 - React 19 Context-as-JSX pattern not yet supported by Next.js 16 build toolchain
 - Imperative FogExp2 via useEffect rather than declarative JSX (React 19 compatibility)
 - TaskStoreContext exported from task-store.tsx for SceneInvalidator direct store subscription
+- TaskSprite default color #7c8db5 for untagged tasks, ethereal lerp(#c8d6e5, 0.25) for starlight feel
+- DriftCount size scaling capped at 5 drifts (max ~30% radius increase)
 
 ### Pending Todos
 
@@ -83,5 +85,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 03-01-PLAN.md (R3F Canvas with fog, bloom, stars, and Zustand invalidation)
+Stopped at: Completed 03-02-PLAN.md (TaskSprite billboard with emissive glow and tag-based coloring)
 Resume file: None
