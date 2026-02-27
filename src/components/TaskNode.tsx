@@ -2,6 +2,7 @@
 
 import type { Task } from '@/types/task';
 import { SCENE_CONSTANTS } from '@/lib/scene-constants';
+import { useIsNewTask } from '@/stores/task-store';
 import { TaskCard } from './TaskCard';
 import { TaskSprite } from './TaskSprite';
 
@@ -17,10 +18,11 @@ export function TaskNode({ task, position }: TaskNodeProps) {
   // Categorical LOD split: immediate + this-week render as cards, rest as sprites.
   // Kept as explicit variable so Phase 4 can extend with camera distance + hysteresis.
   const isCard = cardHorizonsSet.has(task.horizon);
+  const isNew = useIsNewTask(task.id);
 
   if (isCard) {
-    return <TaskCard task={task} position={position} />;
+    return <TaskCard task={task} position={position} isNew={isNew} />;
   }
 
-  return <TaskSprite task={task} position={position} />;
+  return <TaskSprite task={task} position={position} isNew={isNew} />;
 }
