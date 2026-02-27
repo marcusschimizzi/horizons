@@ -9,6 +9,11 @@ import * as THREE from 'three';
 import { SCENE_CONSTANTS } from '@/lib/scene-constants';
 import { TaskStoreContext, useTasksWithHorizon } from '@/stores/task-store';
 import { getTaskPosition, applyOverlapAvoidance } from '@/lib/spatial';
+import { TaskNode } from './TaskNode';
+import { DebugOverlay } from './DebugOverlay';
+
+// O(1) lookup for card horizons (same set as TaskNode, used for breakdown count)
+const cardHorizonsSet = new Set<string>(SCENE_CONSTANTS.cardHorizons);
 
 // ---------------------------------------------------------------------------
 // SceneInvalidator — subscribes to Zustand store and calls invalidate()
@@ -47,10 +52,10 @@ function FogSetup() {
 }
 
 // ---------------------------------------------------------------------------
-// TaskPlaceholders — renders small spheres at each task position
+// TaskNodes — renders TaskNode for each task at its computed position
 // ---------------------------------------------------------------------------
 
-function TaskPlaceholders() {
+function TaskNodes() {
   const tasks = useTasksWithHorizon();
 
   const positionMap = useMemo(() => {
@@ -68,10 +73,11 @@ function TaskPlaceholders() {
         const pos = positionMap.get(task.id);
         if (!pos) return null;
         return (
-          <mesh position={[pos.x, pos.y, pos.z]} key={task.id}>
-            <sphereGeometry args={[0.1, 8, 8]} />
-            <meshBasicMaterial color="white" />
-          </mesh>
+          <TaskNode
+            key={task.id}
+            task={task}
+            position={[pos.x, pos.y, pos.z]}
+          />
         );
       })}
     </>
@@ -97,7 +103,7 @@ function SceneContents() {
         speed={0}
         fade
       />
-      <TaskPlaceholders />
+      <TaskNodes />
       <SceneInvalidator />
       <EffectComposer>
         <Bloom
@@ -116,17 +122,27 @@ function SceneContents() {
 // ---------------------------------------------------------------------------
 
 export default function HorizonScene() {
+  const tasks = useTasksWithHorizon();
+
+  const taskBreakdown = useMemo(() => {
+    const cards = tasks.filter((t) => cardHorizonsSet.has(t.horizon)).length;
+    return { total: tasks.length, cards, sprites: tasks.length - cards };
+  }, [tasks]);
+
   return (
-    <Canvas
-      frameloop="demand"
-      camera={{ position: [0, 0, 10], fov: 60 }}
-      style={{
-        width: '100%',
-        height: '100%',
-        background: SCENE_CONSTANTS.background,
-      }}
-    >
-      <SceneContents />
-    </Canvas>
+    <>
+      <Canvas
+        frameloop="demand"
+        camera={{ position: [0, 0, 10], fov: 60 }}
+        style={{
+          width: '100%',
+          height: '100%',
+          background: SCENE_CONSTANTS.background,
+        }}
+      >
+        <SceneContents />
+      </Canvas>
+      <DebugOverlay taskBreakdown={taskBreakdown} />
+    </>
   );
 }
