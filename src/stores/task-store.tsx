@@ -12,13 +12,16 @@ import { type Horizon, getHorizon } from '@/lib/horizons';
 
 interface TaskState {
   tasks: TaskRow[];
+  newTaskIds: Set<string>;
 }
 
 interface TaskActions {
   setTasks: (tasks: TaskRow[]) => void;
   addTask: (task: TaskRow) => void;
+  replaceTask: (tempId: string, realTask: TaskRow) => void;
   updateTask: (id: string, updates: Partial<TaskRow>) => void;
   removeTask: (id: string) => void;
+  clearNewTask: (id: string) => void;
   refresh: () => Promise<void>;
 }
 
@@ -52,11 +55,27 @@ export function deserializeTask(raw: Record<string, unknown>): TaskRow {
 function createTaskStore(initialTasks: TaskRow[]) {
   return createStore<TaskStore>()((set) => ({
     tasks: initialTasks,
+    newTaskIds: new Set<string>(),
 
     setTasks: (tasks: TaskRow[]) => set({ tasks }),
 
     addTask: (task: TaskRow) =>
-      set((state) => ({ tasks: [...state.tasks, task] })),
+      set((state) => {
+        const ids = new Set(state.newTaskIds);
+        ids.add(task.id);
+        return { tasks: [...state.tasks, task], newTaskIds: ids };
+      }),
+
+    replaceTask: (tempId: string, realTask: TaskRow) =>
+      set((state) => {
+        const ids = new Set(state.newTaskIds);
+        ids.delete(tempId);
+        ids.add(realTask.id);
+        return {
+          tasks: state.tasks.map((t) => (t.id === tempId ? realTask : t)),
+          newTaskIds: ids,
+        };
+      }),
 
     updateTask: (id: string, updates: Partial<TaskRow>) =>
       set((state) => ({
@@ -66,9 +85,21 @@ function createTaskStore(initialTasks: TaskRow[]) {
       })),
 
     removeTask: (id: string) =>
-      set((state) => ({
-        tasks: state.tasks.filter((t) => t.id !== id),
-      })),
+      set((state) => {
+        const ids = new Set(state.newTaskIds);
+        ids.delete(id);
+        return {
+          tasks: state.tasks.filter((t) => t.id !== id),
+          newTaskIds: ids,
+        };
+      }),
+
+    clearNewTask: (id: string) =>
+      set((state) => {
+        const ids = new Set(state.newTaskIds);
+        ids.delete(id);
+        return { newTaskIds: ids };
+      }),
 
     refresh: async () => {
       const res = await fetch('/api/tasks');
@@ -158,7 +189,15 @@ function useTasksByHorizon(): Map<Horizon, Task[]> {
 }
 
 // ---------------------------------------------------------------------------
+// New-task selector (for entrance animations)
+// ---------------------------------------------------------------------------
+
+function useIsNewTask(taskId: string): boolean {
+  return useTaskStore((state) => state.newTaskIds.has(taskId));
+}
+
+// ---------------------------------------------------------------------------
 // Exports
 // ---------------------------------------------------------------------------
 
-export { TaskStoreContext, TaskStoreProvider, useTaskStore, useTasksWithHorizon, useTasksByHorizon };
+export { TaskStoreContext, TaskStoreProvider, useTaskStore, useTasksWithHorizon, useTasksByHorizon, useIsNewTask };

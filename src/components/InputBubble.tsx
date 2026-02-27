@@ -1,16 +1,30 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useContext } from 'react';
+import { TaskStoreContext, deserializeTask } from '@/stores/task-store';
+import { getHorizon, getZDepth } from '@/lib/horizons';
+import { cameraStore } from '@/stores/camera-store';
+import type { TaskRow } from '@/types/task';
+import type { ParsedTask } from '@/app/api/parse/route';
+
+// ---------------------------------------------------------------------------
+// Horizon label mapping for toast display
+// ---------------------------------------------------------------------------
+
+const HORIZON_LABELS: Record<string, string> = {
+  immediate: 'Now',
+  'this-week': 'This Week',
+  'this-month': 'This Month',
+  'this-quarter': 'This Quarter',
+  'this-year': 'This Year',
+  someday: 'Someday',
+};
 
 // ---------------------------------------------------------------------------
 // InputBubble — fixed DOM overlay input at bottom center of viewport
 // ---------------------------------------------------------------------------
 
-export interface InputBubbleProps {
-  onSubmit?: (input: string) => Promise<{ title: string; horizon: string } | void>;
-}
-
-export function InputBubble({ onSubmit }: InputBubbleProps) {
+export function InputBubble() {
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,6 +39,8 @@ export function InputBubble({ onSubmit }: InputBubbleProps) {
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const toastFadeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  const store = useContext(TaskStoreContext);
+
   // Clean up timers on unmount
   useEffect(() => {
     return () => {
@@ -34,47 +50,137 @@ export function InputBubble({ onSubmit }: InputBubbleProps) {
     };
   }, []);
 
+  // Show toast helper
+  const showToast = useCallback((title: string, horizonLabel: string) => {
+    setToastFading(false);
+    setToast({ title, horizon: horizonLabel });
+
+    if (toastFadeTimerRef.current) clearTimeout(toastFadeTimerRef.current);
+    toastFadeTimerRef.current = setTimeout(() => {
+      setToastFading(true);
+    }, 2500);
+
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = setTimeout(() => {
+      setToast(null);
+      setToastFading(false);
+    }, 3000);
+  }, []);
+
   const handleSubmit = useCallback(async () => {
     const trimmed = inputValue.trim();
-    if (!trimmed || isLoading || !onSubmit) return;
+    if (!trimmed || isLoading || !store) return;
 
     setIsLoading(true);
     setError(null);
 
+    // Step 1: Parse via /api/parse
+    let parsed: ParsedTask;
     try {
-      const result = await onSubmit(trimmed);
-      setInputValue('');
+      let parseRes = await fetch('/api/parse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ input: trimmed }),
+      });
 
-      if (result) {
-        setToastFading(false);
-        setToast(result);
-
-        // Auto-dismiss toast after 3 seconds (with fade-out starting at 2.5s)
-        if (toastFadeTimerRef.current) clearTimeout(toastFadeTimerRef.current);
-        toastFadeTimerRef.current = setTimeout(() => {
-          setToastFading(true);
-        }, 2500);
-
-        if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
-        toastTimerRef.current = setTimeout(() => {
-          setToast(null);
-          setToastFading(false);
-        }, 3000);
+      // Silent retry once on failure
+      if (!parseRes.ok) {
+        parseRes = await fetch('/api/parse', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ input: trimmed }),
+        });
       }
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Something went wrong';
-      setError(message);
 
-      // Auto-dismiss error after 5 seconds
-      if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
-      errorTimerRef.current = setTimeout(() => {
-        setError(null);
-      }, 5000);
-    } finally {
+      if (!parseRes.ok) {
+        setError("Couldn't understand that. Try rephrasing.");
+        setIsLoading(false);
+        inputRef.current?.focus();
+        return;
+      }
+
+      parsed = await parseRes.json();
+    } catch {
+      setError("Couldn't understand that. Try rephrasing.");
       setIsLoading(false);
       inputRef.current?.focus();
+      return;
     }
-  }, [inputValue, isLoading, onSubmit]);
+
+    // Step 2: Build optimistic temp task
+    const tempId = `temp-${Date.now()}`;
+    const now = new Date();
+    const tempTask: TaskRow = {
+      id: tempId,
+      rawInput: trimmed,
+      title: parsed.title,
+      targetDateEarliest: parsed.targetDateEarliest ? new Date(parsed.targetDateEarliest) : null,
+      targetDateLatest: parsed.targetDateLatest ? new Date(parsed.targetDateLatest) : null,
+      hardDeadline: null,
+      needsRefinement: parsed.needsRefinement,
+      refinementPrompt: null,
+      status: 'active',
+      createdAt: now,
+      updatedAt: now,
+      driftCount: 0,
+      tags: parsed.tags.length > 0 ? parsed.tags : null,
+    };
+
+    // Step 3: Add optimistically to store
+    store.getState().addTask(tempTask);
+
+    // Step 4: Compute horizon for toast and camera pan
+    const targetDate = tempTask.targetDateEarliest && tempTask.targetDateLatest
+      ? { earliest: tempTask.targetDateEarliest, latest: tempTask.targetDateLatest }
+      : null;
+    const horizon = getHorizon(targetDate, now);
+    const horizonLabel = HORIZON_LABELS[horizon] ?? horizon;
+
+    // Step 5: Clear input, stop loading
+    setInputValue('');
+    setIsLoading(false);
+    inputRef.current?.focus();
+
+    // Step 6: Show toast
+    showToast(parsed.title, horizonLabel);
+
+    // Step 7: Camera pan if horizon is out of view
+    const horizonZ = getZDepth(horizon);
+    const { currentZ } = cameraStore.getState();
+    const isVisible = horizonZ <= currentZ && horizonZ >= currentZ - 15;
+    if (!isVisible) {
+      cameraStore.setState({ targetZ: horizonZ + 7.5, isAnimating: true });
+    }
+
+    // Step 8: Background persist (fire and forget)
+    fetch('/api/tasks', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: parsed.title,
+        rawInput: trimmed,
+        targetDateEarliest: tempTask.targetDateEarliest?.toISOString() ?? null,
+        targetDateLatest: tempTask.targetDateLatest?.toISOString() ?? null,
+        needsRefinement: parsed.needsRefinement,
+        tags: parsed.tags.length > 0 ? parsed.tags : null,
+        status: 'active' as const,
+      }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error('Persist failed');
+        return res.json();
+      })
+      .then((data: Record<string, unknown>) => {
+        const real = deserializeTask(data);
+        store.getState().replaceTask(tempId, real);
+      })
+      .catch(() => {
+        store.getState().removeTask(tempId);
+        setError("Couldn't save task. Try again.");
+        if (errorTimerRef.current) clearTimeout(errorTimerRef.current);
+        errorTimerRef.current = setTimeout(() => setError(null), 5000);
+      });
+  }, [inputValue, isLoading, store, showToast]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
