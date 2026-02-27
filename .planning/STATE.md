@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** The spatial view must make you feel your future — if the 3D scene doesn't feel meaningfully different from a list, nothing else matters.
-**Current focus:** Phase 4 — Camera (In progress)
+**Current focus:** Phase 4 — Camera (Complete)
 
 ## Current Position
 
 Phase: 4 of 7 (Camera)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-02-27 — Completed 04-01-PLAN.md
+Plan: 2 of 2 in current phase
+Status: Phase complete
+Last activity: 2026-02-27 — Completed 04-02-PLAN.md
 
 Progress: [████████████████████░░] ~52% (11 plans of ~21 estimated total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
+- Total plans completed: 12
 - Average duration: 2 min
-- Total execution time: 26 min
+- Total execution time: 29 min
 
 **By Phase:**
 
@@ -30,10 +30,10 @@ Progress: [████████████████████░░] ~
 | 01-foundation | 3/3 | 10 min | 3 min |
 | 02-data-layer | 2/2 | 9 min | 5 min |
 | 03-3d-scene | 4/4 | 5 min | 1 min |
-| 04-camera | 1/2 | 2 min | 2 min |
+| 04-camera | 2/2 | 5 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 03-02 (1 min), 03-03 (1 min), 03-04 (1 min), 04-01 (2 min)
+- Last 5 plans: 03-03 (1 min), 03-04 (1 min), 04-01 (2 min), 04-02 (3 min)
 - Trend: consistent
 
 *Updated after each plan completion*
@@ -79,6 +79,9 @@ Recent decisions affecting current work:
 - Vanilla Zustand store (createStore) for camera state — non-reactive getState() in useFrame avoids React re-renders
 - Exponential rubber-band formula for near boundary overscroll — maxOverscroll * (1 - exp(-overscroll/maxOverscroll))
 - Spring-back triggers when velocity < 0.5 while past nearBoundary (not immediately, so user feels resistance)
+- SnapToPresent is a plain DOM overlay (not R3F) — rendered as sibling to Canvas, uses cameraStore subscription for visibility
+- Combined damp3 on [parallaxX, parallaxY, targetZ] — single call handles parallax and scroll simultaneously
+- DOM-to-Canvas invalidation bridge via cameraStore.subscribe in CameraRig — triggers invalidate() when isAnimating becomes true
 
 ### Pending Todos
 
@@ -93,5 +96,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 04-01-PLAN.md (Camera store + CameraRig with scroll-driven Z-axis movement)
+Stopped at: Completed 04-02-PLAN.md (Phase 4 complete — snap-to-present + parallax, all 5 CAM requirements met)
 Resume file: None

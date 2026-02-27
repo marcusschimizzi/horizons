@@ -150,7 +150,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 1. Foundation | 3/3 | Complete | 2026-02-27 |
 | 2. Data Layer | 2/2 | Complete | 2026-02-27 |
 | 3. 3D Scene | 4/4 | Complete | 2026-02-27 |
-| 4. Camera | 0/2 | Not started | - |
+| 4. Camera | 2/2 | Complete | 2026-02-27 |
 | 5. Capture | 0/3 | Not started | - |
 | 6. Task Interactions | 0/3 | Not started | - |
 | 7. Polish | 0/4 | Not started | - |
