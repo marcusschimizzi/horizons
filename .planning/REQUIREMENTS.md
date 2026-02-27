@@ -100,49 +100,47 @@
 
 ## Traceability
 
-*Populated during roadmap creation.*
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SCENE-01 | — | Pending |
-| SCENE-02 | — | Pending |
-| SCENE-03 | — | Pending |
-| SCENE-04 | — | Pending |
-| SCENE-05 | — | Pending |
-| SCENE-06 | — | Pending |
-| CAM-01 | — | Pending |
-| CAM-02 | — | Pending |
-| CAM-03 | — | Pending |
-| CAM-04 | — | Pending |
-| CAM-05 | — | Pending |
-| CAP-01 | — | Pending |
-| CAP-02 | — | Pending |
-| CAP-03 | — | Pending |
-| CAP-04 | — | Pending |
-| CAP-05 | — | Pending |
-| TASK-01 | — | Pending |
-| TASK-02 | — | Pending |
-| TASK-03 | — | Pending |
-| TASK-04 | — | Pending |
-| TASK-05 | — | Pending |
-| ACCT-01 | — | Pending |
-| ACCT-02 | — | Pending |
-| ACCT-03 | — | Pending |
-| ACCT-04 | — | Pending |
-| ACCT-05 | — | Pending |
-| ACCT-06 | — | Pending |
-| NAV-01 | — | Pending |
-| NAV-02 | — | Pending |
-| NAV-03 | — | Pending |
-| VIS-01 | — | Pending |
-| VIS-02 | — | Pending |
-| VIS-03 | — | Pending |
+| SCENE-01 | Phase 3 | Pending |
+| SCENE-02 | Phase 3 | Pending |
+| SCENE-03 | Phase 3 | Pending |
+| SCENE-04 | Phase 3 | Pending |
+| SCENE-05 | Phase 3 | Pending |
+| SCENE-06 | Phase 3 | Pending |
+| CAM-01 | Phase 4 | Pending |
+| CAM-02 | Phase 4 | Pending |
+| CAM-03 | Phase 4 | Pending |
+| CAM-04 | Phase 4 | Pending |
+| CAM-05 | Phase 4 | Pending |
+| CAP-01 | Phase 5 | Pending |
+| CAP-02 | Phase 5 | Pending |
+| CAP-03 | Phase 5 | Pending |
+| CAP-04 | Phase 5 | Pending |
+| CAP-05 | Phase 5 | Pending |
+| TASK-01 | Phase 6 | Pending |
+| TASK-02 | Phase 6 | Pending |
+| TASK-03 | Phase 6 | Pending |
+| TASK-04 | Phase 6 | Pending |
+| TASK-05 | Phase 6 | Pending |
+| ACCT-01 | Phase 7 | Pending |
+| ACCT-02 | Phase 7 | Pending |
+| ACCT-03 | Phase 7 | Pending |
+| ACCT-04 | Phase 7 | Pending |
+| ACCT-05 | Phase 7 | Pending |
+| ACCT-06 | Phase 7 | Pending |
+| NAV-01 | Phase 7 | Pending |
+| NAV-02 | Phase 7 | Pending |
+| NAV-03 | Phase 7 | Pending |
+| VIS-01 | Phase 3 | Pending |
+| VIS-02 | Phase 3 | Pending |
+| VIS-03 | Phase 3 | Pending |
 
 **Coverage:**
 - v1 requirements: 33 total
-- Mapped to phases: 0
-- Unmapped: 33 ⚠️
+- Mapped to phases: 33
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-26*
-*Last updated: 2026-02-26 after initial definition*
+*Last updated: 2026-02-26 after roadmap creation*
