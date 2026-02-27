@@ -26,7 +26,7 @@ The spatial view must make you *feel* your future — ambient awareness of what'
 - [ ] User can refine flagged tasks (Haiku generates refinement prompts)
 - [ ] Drift count increments when tasks pass their horizon without completion
 - [ ] List view escape hatch for triage and execution
-- [ ] App deployed to Vercel and usable day-to-day
+- [ ] App deployed to Railway and usable day-to-day
 
 ### Out of Scope
 
@@ -45,14 +45,14 @@ Marcus currently uses 3+ task management tools and nothing sticks. The hypothesi
 
 **Stack is fully decided** (from PRD):
 - Framework: Next.js (App Router) + TypeScript
-- Database: PostgreSQL via Neon (serverless, free tier, Vercel-native)
+- Database: PostgreSQL via Railway (native service, auto-injected DATABASE_URL)
 - ORM: Drizzle (lightweight, type-safe)
 - 3D: React Three Fiber + drei + @react-three/postprocessing
 - AI: Anthropic API (Haiku) via Next.js API routes — key never hits client
 - Styling: Tailwind CSS (2D overlay elements)
 - Animation: Framer Motion (2D) + R3F springs (3D)
 - State: Zustand (client cache, Postgres is source of truth)
-- Deploy: Vercel
+- Deploy: Railway
 
 **Time model:** Six named horizons (Immediate → Someday) mapped to Z-depth bands. Horizon is computed from `targetDate` (fuzzy `DateRange`) — not stored. Tasks drift forward automatically as real time passes.
 
@@ -75,7 +75,7 @@ Marcus currently uses 3+ task management tools and nothing sticks. The hypothesi
 | Haiku for all AI parsing | Fast, extremely cheap (<1¢/day for personal use). Escalation to larger model deferred | — Pending |
 | driftCount as accountability | Every push increments count. Visible cue. 5+ drifts = prompt to drop or commit | — Pending |
 | Horizon computed client-side, not stored | Horizon changes as real time passes — it's a view derived from targetDate + current date | — Pending |
-| Neon over localStorage | PRD started with localStorage but decided Postgres from the start. Schema maps directly to TypeScript interface | — Pending |
+| Railway Postgres over localStorage/Neon | PRD started with localStorage, then considered Neon (Vercel-native). Switched to Railway Postgres — simpler setup, standard drivers, one dashboard, correct connection model for persistent Node server | — Pending |
 
 ---
 *Last updated: 2026-02-26 after initialization*
