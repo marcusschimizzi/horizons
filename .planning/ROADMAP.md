@@ -31,12 +31,12 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. `drizzle-kit push` applies the tasks schema to Railway Postgres with no errors
   3. `lib/horizons.ts` exports `getHorizon(targetDate, now)` and `getZDepth(horizon)` — importable by any module
   4. TypeScript compiles the full codebase with zero type errors
-**Plans**: TBD
+**Plans**: 3 plans in 2 waves
 
 Plans:
-- [ ] 01-01: Next.js 15 scaffold — App Router, TypeScript, Tailwind v4, package pinning (three + R3F version matrix)
-- [ ] 01-02: DB layer — Drizzle schema, Railway Postgres connection (globalThis singleton), migrations
-- [ ] 01-03: Shared types (`src/types/task.ts`) and `lib/horizons.ts` horizon math + scatter algorithm
+- [ ] 01-01-PLAN.md — Next.js 15 scaffold, R3F 9 version matrix, Tailwind v4, Docker Compose Postgres (Wave 1)
+- [ ] 01-02-PLAN.md — Drizzle schema, globalThis connection singleton, migrations (Wave 2)
+- [ ] 01-03-PLAN.md — Shared types, horizon math, spatial scatter algorithm with TDD (Wave 2)
 
 ### Phase 2: Data Layer
 **Goal**: The app has real task data in Postgres, a working CRUD API, and a Zustand store that hydrates from the server — the 3D scene has everything it needs to render without building any UI yet.
