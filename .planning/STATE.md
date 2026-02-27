@@ -5,33 +5,33 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** The spatial view must make you feel your future — if the 3D scene doesn't feel meaningfully different from a list, nothing else matters.
-**Current focus:** Phase 2 — Data Layer
+**Current focus:** Phase 3 — 3D Scene
 
 ## Current Position
 
 Phase: 2 of 7 (Data Layer)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-02-27 — Completed 02-01-PLAN.md
+Plan: 2 of 2 in current phase
+Status: Phase complete
+Last activity: 2026-02-27 — Completed 02-02-PLAN.md
 
-Progress: [████████░░░░░░░░░░░░] ~20% (4 plans of ~20 estimated total)
+Progress: [█████████░░░░░░░░░░░] ~25% (5 plans of ~21 estimated total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
+- Total plans completed: 5
 - Average duration: 4 min
-- Total execution time: 15 min
+- Total execution time: 19 min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 3/3 | 10 min | 3 min |
-| 02-data-layer | 1/2 | 5 min | 5 min |
+| 02-data-layer | 2/2 | 9 min | 5 min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (4 min), 01-02 (2 min), 01-03 (4 min), 02-01 (5 min)
+- Last 5 plans: 01-02 (2 min), 01-03 (4 min), 02-01 (5 min), 02-02 (4 min)
 - Trend: stable
 
 *Updated after each plan completion*
@@ -62,6 +62,9 @@ Recent decisions affecting current work:
 - npm run db:seed uses node --env-file=.env.local --import=tsx for env loading
 - API error shape: { error: string, code: string } with INTERNAL_ERROR, VALIDATION_ERROR, TASK_NOT_FOUND
 - PATCH uses allowlist of updatable fields (strips unknown keys)
+- Zustand store file must use .tsx extension (contains JSX for Context.Provider)
+- Context.Provider accessed via extracted variable (Next.js 16 Turbopack namespace resolution issue)
+- React 19 Context-as-JSX pattern not yet supported by Next.js 16 build toolchain
 
 ### Pending Todos
 
@@ -77,5 +80,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 02-01-PLAN.md (CRUD API routes + seed script)
+Stopped at: Completed 02-02-PLAN.md (Zustand store + SceneLoader + page.tsx wiring — Phase 2 complete)
 Resume file: None
