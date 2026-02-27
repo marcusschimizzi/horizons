@@ -50,6 +50,7 @@ export function DebugOverlay({ taskBreakdown }: DebugOverlayProps) {
       <div>spriteBaseRadius: {SCENE_CONSTANTS.spriteBaseRadius}</div>
       <div>spriteEmissiveMultiplier: {SCENE_CONSTANTS.spriteEmissiveMultiplier}</div>
       <div>htmlDistanceFactor: {SCENE_CONSTANTS.htmlDistanceFactor}</div>
+      <div>lodBoundary: {SCENE_CONSTANTS.cardHorizons.join(', ')}</div>
       <div style={{ ...headingStyle, marginTop: 8 }}>Tasks</div>
       <div>total: {taskBreakdown.total}</div>
       <div>cards: {taskBreakdown.cards}</div>
