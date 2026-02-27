@@ -47,11 +47,11 @@ Plans:
   2. `POST /api/tasks`, `PATCH /api/tasks/[id]`, `DELETE /api/tasks/[id]` all persist changes to Postgres
   3. Zustand store hydrates synchronously from server-fetched tasks before first render (no flash)
   4. `SceneLoader` component enforces the client/server boundary — Canvas never imported by RSC
-**Plans**: TBD
+**Plans**: 2 plans in 1 wave
 
 Plans:
-- [ ] 02-01: CRUD API routes (`/api/tasks`, `/api/tasks/[id]`) + seed script with representative tasks across all six horizons
-- [ ] 02-02: Zustand store (`useTaskStore`) + `SceneLoader.tsx` with `dynamic(ssr: false)` boundary and synchronous hydration
+- [ ] 02-01-PLAN.md — CRUD API routes (GET/POST/PATCH/DELETE) + seed script with ~35 representative tasks (Wave 1)
+- [ ] 02-02-PLAN.md — Zustand vanilla store + SceneLoader client boundary + page.tsx server data fetch (Wave 1)
 
 ### Phase 3: 3D Scene
 **Goal**: The spatial thesis is visible — users can see tasks laid out by time horizon in 3D space, with fog making distance legible, close tasks rendered as full cards, distant tasks as glowing sprites, LOD transitioning smoothly between them, and the scene atmosphere giving the dark-space feel.
