@@ -10,6 +10,7 @@ import { SCENE_CONSTANTS } from '@/lib/scene-constants';
 import { TaskStoreContext, useTasksWithHorizon } from '@/stores/task-store';
 import { getTaskPosition, applyOverlapAvoidance } from '@/lib/spatial';
 import { TaskNode } from './TaskNode';
+import { CameraRig } from './CameraRig';
 import { DebugOverlay } from './DebugOverlay';
 
 // O(1) lookup for card horizons (same set as TaskNode, used for breakdown count)
@@ -103,6 +104,7 @@ function SceneContents() {
         speed={0}
         fade
       />
+      <CameraRig />
       <TaskNodes />
       <SceneInvalidator />
       <EffectComposer>
@@ -133,7 +135,7 @@ export default function HorizonScene() {
     <>
       <Canvas
         frameloop="demand"
-        camera={{ position: [0, 0, 10], fov: 60 }}
+        camera={{ position: [0, 0, SCENE_CONSTANTS.cameraRestZ], fov: 60 }}
         style={{
           width: '100%',
           height: '100%',
