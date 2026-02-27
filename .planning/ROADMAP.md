@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Data Layer** - CRUD API routes, seed data, Zustand store, SceneLoader client boundary
 - [x] **Phase 3: 3D Scene** - Canvas, fog, atmosphere, TaskNodes with LOD (card + sprite), visual system
 - [x] **Phase 4: Camera** - Scroll Z-axis movement, easing/momentum, limits, snap-to-present, mouse parallax
-- [ ] **Phase 5: Capture** - Natural language input bubble, Haiku parse route, persistence, entrance animation
+- [x] **Phase 5: Capture** - Natural language input bubble, Haiku parse route, persistence, entrance animation
 - [ ] **Phase 6: Task Interactions** - TaskDetail panel, complete/drop/reschedule/edit with animations
 - [ ] **Phase 7: Polish** - Accountability/drift tracking, refinement flow, list view, bloom tuning
 
@@ -115,12 +115,12 @@ Plans:
   3. Dropping a task removes it immediately — distinct from complete, no celebration, just gone
   4. Rescheduling a task updates its target date and the task node visibly drifts to its new Z-position in the scene
   5. Editing a task's title and details from the detail panel persists the change to Postgres
-**Plans**: TBD
+**Plans**: 3 plans in 3 waves
 
 Plans:
-- [ ] 06-01: `TaskDetail.tsx` — slide-in 2D overlay panel wired to clicked task in store (TASK-01)
-- [ ] 06-02: Complete action + dissolution animation (TASK-02) and drop action (TASK-03)
-- [ ] 06-03: Reschedule (TASK-04) and inline title/detail edit (TASK-05) with Postgres persistence
+- [ ] 06-01-PLAN.md — Store extensions, click handlers on TaskCard/TaskSprite, TaskDetail slide-in panel (TASK-01) (Wave 1)
+- [ ] 06-02-PLAN.md — Complete action with particle burst dissolution + undo toast, Drop action with instant removal, GET filter for active-only (TASK-02, TASK-03) (Wave 2)
+- [ ] 06-03-PLAN.md — Reschedule via horizon band selector with smooth drift animation, inline title/details editing with auto-save (TASK-04, TASK-05) (Wave 3)
 
 ### Phase 7: Polish
 **Goal**: The experience is complete — drift accountability is tracked and surfaced, AI-powered refinement prompts work end-to-end, the list view escape hatch is fully functional, and bloom post-processing is tuned so the scene looks right with real task data.
