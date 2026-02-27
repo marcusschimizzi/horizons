@@ -98,12 +98,12 @@ Plans:
   3. The parsed task is written to Postgres immediately and survives a hard page refresh
   4. The new task materializes in the 3D scene at its correct horizon Z-position with a fade-in/scale-up entrance animation
   5. No network request to the Anthropic API is ever visible in browser DevTools — all AI calls are server-side
-**Plans**: TBD
+**Plans**: 3 plans in 2 waves
 
 Plans:
-- [ ] 05-01: `InputBubble.tsx` — fixed overlay input with submit handling and loading state (CAP-01)
-- [ ] 05-02: `/api/parse` route — Haiku prompt engineering, structured JSON extraction, server-side key enforcement (CAP-02, CAP-05)
-- [ ] 05-03: Persistence + optimistic store update + entrance animation on new task node (CAP-03, CAP-04)
+- [ ] 05-01-PLAN.md — InputBubble.tsx: fixed overlay input with submit handling, loading state, toast, error display (CAP-01) (Wave 1)
+- [ ] 05-02-PLAN.md — /api/parse route: Haiku structured extraction with zodOutputFormat, server-side key enforcement (CAP-02, CAP-05) (Wave 1)
+- [ ] 05-03-PLAN.md — Optimistic store update, Postgres persistence, entrance animations, camera auto-pan (CAP-03, CAP-04) (Wave 2)
 
 ### Phase 6: Task Interactions
 **Goal**: The mutation loop is complete — users can click any task to open its detail panel and from there complete it with a satisfying dissolution, drop it without ceremony, reschedule it to a new horizon, or edit its title and details.
@@ -151,6 +151,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 2. Data Layer | 2/2 | Complete | 2026-02-27 |
 | 3. 3D Scene | 4/4 | Complete | 2026-02-27 |
 | 4. Camera | 2/2 | Complete | 2026-02-27 |
-| 5. Capture | 0/3 | Not started | - |
+| 5. Capture | 3/3 | Complete | 2026-02-27 |
 | 6. Task Interactions | 0/3 | Not started | - |
 | 7. Polish | 0/4 | Not started | - |

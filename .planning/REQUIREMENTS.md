@@ -113,11 +113,11 @@
 | CAM-03 | Phase 4 | Complete |
 | CAM-04 | Phase 4 | Complete |
 | CAM-05 | Phase 4 | Complete |
-| CAP-01 | Phase 5 | Pending |
-| CAP-02 | Phase 5 | Pending |
-| CAP-03 | Phase 5 | Pending |
-| CAP-04 | Phase 5 | Pending |
-| CAP-05 | Phase 5 | Pending |
+| CAP-01 | Phase 5 | Complete |
+| CAP-02 | Phase 5 | Complete |
+| CAP-03 | Phase 5 | Complete |
+| CAP-04 | Phase 5 | Complete |
+| CAP-05 | Phase 5 | Complete |
 | TASK-01 | Phase 6 | Pending |
 | TASK-02 | Phase 6 | Pending |
 | TASK-03 | Phase 6 | Pending |
