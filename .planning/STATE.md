@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-26)
 ## Current Position
 
 Phase: 7 of 7 (Polish)
-Plan: 1 of 4 in phase
+Plan: 2 of 4 in phase
 Status: In progress
-Last activity: 2026-02-27 — Completed 07-01-PLAN.md (Drift Recalculation and Notification)
+Last activity: 2026-02-27 — Completed 07-02-PLAN.md (Drift and Refinement Indicators)
 
-Progress: [███████████████████████████░] ~86% (18 plans of 21 total)
+Progress: [████████████████████████████░] ~90% (19 plans of 21 total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 18
+- Total plans completed: 19
 - Average duration: 2 min
-- Total execution time: 44 min
+- Total execution time: 46 min
 
 **By Phase:**
 
@@ -33,10 +33,10 @@ Progress: [███████████████████████
 | 04-camera | 2/2 | 5 min | 3 min |
 | 05-capture | 3/3 | ~20 min | ~7 min |
 | 06-task-interactions | 3/3 | 9 min | 3 min |
-| 07-polish | 1/4 | 2 min | 2 min |
+| 07-polish | 2/4 | 4 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 06-01 (2 min), 06-02 (4 min), 06-03 (3 min), 07-01 (2 min)
+- Last 5 plans: 06-02 (4 min), 06-03 (3 min), 07-01 (2 min), 07-02 (2 min)
 - Trend: consistent
 
 *Updated after each plan completion*
@@ -108,6 +108,9 @@ Recent decisions affecting current work:
 - DriftNotification z-index 105 (above SnapToPresent 100, below InputBubble 110)
 - Bloom luminance threshold lowered from 1.0 to 0.15 for broader glow coverage
 - Adaptive fog density: baseDensity + min(taskCount * 0.0002, 0.008)
+- hardDeadline amber pulse takes priority over needsRefinement blue pulse on cards
+- Deadline ring at 1.2-1.35x radius, refinement ring at 1.4-1.6x radius for visual separation on sprites
+- Drift desaturation uses graduated lerp from 0.25 base to 0.7 max toward ETHEREAL_TARGET
 
 ### Pending Todos
 
@@ -121,5 +124,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 07-01-PLAN.md (Drift Recalculation and Notification)
+Stopped at: Completed 07-02-PLAN.md (Drift and Refinement Indicators)
 Resume file: None
