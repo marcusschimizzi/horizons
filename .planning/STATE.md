@@ -2,17 +2,16 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-26)
+See: .planning/PROJECT.md (updated 2026-02-28)
 
 **Core value:** The spatial view must make you feel your future — if the 3D scene doesn't feel meaningfully different from a list, nothing else matters.
-**Current focus:** Phase 7 — Polish (In progress)
+**Current focus:** Thesis testing — v1.0 shipped, in daily use on Railway
 
 ## Current Position
 
-Phase: 7 of 7 (Polish)
-Plan: 4 of 4 in phase
-Status: Phase complete
-Last activity: 2026-02-27 — Completed 07-04-PLAN.md (List View and Toggle Integration)
+Milestone: v1.0 Spatial MVP — SHIPPED 2026-02-28
+Status: Milestone complete, archived
+Last activity: 2026-02-28 — Archived v1.0 milestone (7 phases, 21 plans, 4,759 LOC)
 
 Progress: [██████████████████████████████] 100% (21 plans of 21 total)
 
@@ -130,6 +129,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-27
-Stopped at: Completed 07-04-PLAN.md (List View and Toggle Integration) - ALL PHASES COMPLETE
+Last session: 2026-02-28
+Stopped at: v1.0 milestone archived — git tag v1.0 created
 Resume file: None
