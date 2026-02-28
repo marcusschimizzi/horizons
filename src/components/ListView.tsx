@@ -94,6 +94,13 @@ export function ListView() {
     setListFilter('needsRefinement', listFilters.needsRefinement === true ? null : true);
   };
 
+  const toggleHorizonFilter = (horizon: string) => {
+    const newHorizons = new Set(listFilters.horizons);
+    if (newHorizons.has(horizon)) newHorizons.delete(horizon);
+    else newHorizons.add(horizon);
+    setListFilter('horizons', newHorizons);
+  };
+
   // Quick actions
   const handleQuickComplete = async (taskId: string) => {
     store?.getState().startCompletion(taskId);
@@ -190,6 +197,25 @@ export function ListView() {
         >
           needs refinement
         </button>
+        <span style={{ width: 1, background: 'rgba(148,163,184,0.15)', alignSelf: 'stretch', margin: '0 4px' }} />
+        {HORIZON_ORDER.map((h) => (
+          <button
+            key={h}
+            onClick={() => toggleHorizonFilter(h)}
+            style={{
+              padding: '4px 10px',
+              borderRadius: 20,
+              border: `1px solid ${listFilters.horizons.has(h) ? HORIZON_COLORS[h] : 'rgba(148,163,184,0.2)'}`,
+              background: listFilters.horizons.has(h) ? `${HORIZON_COLORS[h]}18` : 'transparent',
+              color: listFilters.horizons.has(h) ? HORIZON_COLORS[h] : '#64748b',
+              fontSize: 11,
+              fontFamily: 'monospace',
+              cursor: 'pointer',
+            }}
+          >
+            {HORIZON_LABELS[h]}
+          </button>
+        ))}
       </div>
 
       {/* Horizon groups */}
