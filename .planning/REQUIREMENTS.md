@@ -123,18 +123,18 @@
 | TASK-03 | Phase 6 | Complete |
 | TASK-04 | Phase 6 | Complete |
 | TASK-05 | Phase 6 | Complete |
-| ACCT-01 | Phase 7 | Pending |
-| ACCT-02 | Phase 7 | Pending |
-| ACCT-03 | Phase 7 | Pending |
-| ACCT-04 | Phase 7 | Pending |
-| ACCT-05 | Phase 7 | Pending |
-| ACCT-06 | Phase 7 | Pending |
-| NAV-01 | Phase 7 | Pending |
-| NAV-02 | Phase 7 | Pending |
-| NAV-03 | Phase 7 | Pending |
-| VIS-01 | Phase 3 | Pending |
-| VIS-02 | Phase 3 | Pending |
-| VIS-03 | Phase 3 | Pending |
+| ACCT-01 | Phase 7 | Complete |
+| ACCT-02 | Phase 7 | Complete |
+| ACCT-03 | Phase 7 | Complete |
+| ACCT-04 | Phase 7 | Complete |
+| ACCT-05 | Phase 7 | Complete |
+| ACCT-06 | Phase 7 | Complete |
+| NAV-01 | Phase 7 | Complete |
+| NAV-02 | Phase 7 | Complete |
+| NAV-03 | Phase 7 | Complete |
+| VIS-01 | Phase 3 | Complete |
+| VIS-02 | Phase 3 | Complete |
+| VIS-03 | Phase 7 | Complete |
 
 **Coverage:**
 - v1 requirements: 33 total
