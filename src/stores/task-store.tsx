@@ -10,12 +10,20 @@ import { type Horizon, getHorizon } from '@/lib/horizons';
 // Types
 // ---------------------------------------------------------------------------
 
+interface ListFilters {
+  tags: Set<string>;
+  needsRefinement: boolean | null;
+  horizons: Set<string>;
+}
+
 interface TaskState {
   tasks: TaskRow[];
   newTaskIds: Set<string>;
   completingTaskIds: Set<string>;
   droppingTaskIds: Set<string>;
   selectedTaskId: string | null;
+  showListView: boolean;
+  listFilters: ListFilters;
 }
 
 interface TaskActions {
@@ -34,6 +42,8 @@ interface TaskActions {
   restoreTask: (task: TaskRow) => void;
   startDrop: (id: string) => void;
   finishDrop: (id: string) => void;
+  toggleListView: () => void;
+  setListFilter: (key: keyof ListFilters, value: ListFilters[keyof ListFilters]) => void;
 }
 
 type TaskStore = TaskState & TaskActions;
@@ -70,6 +80,12 @@ function createTaskStore(initialTasks: TaskRow[]) {
     completingTaskIds: new Set<string>(),
     droppingTaskIds: new Set<string>(),
     selectedTaskId: null,
+    showListView: false,
+    listFilters: {
+      tags: new Set<string>(),
+      needsRefinement: null,
+      horizons: new Set<string>(),
+    },
 
     setTasks: (tasks: TaskRow[]) => set({ tasks }),
 
@@ -179,6 +195,13 @@ function createTaskStore(initialTasks: TaskRow[]) {
           newTaskIds: newIds,
         };
       }),
+
+    toggleListView: () => set((state) => ({ showListView: !state.showListView })),
+
+    setListFilter: (key, value) =>
+      set((state) => ({
+        listFilters: { ...state.listFilters, [key]: value },
+      })),
   }));
 }
 
