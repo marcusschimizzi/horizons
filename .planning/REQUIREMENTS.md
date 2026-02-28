@@ -102,12 +102,12 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SCENE-01 | Phase 3 | Pending |
-| SCENE-02 | Phase 3 | Pending |
-| SCENE-03 | Phase 3 | Pending |
-| SCENE-04 | Phase 3 | Pending |
-| SCENE-05 | Phase 3 | Pending |
-| SCENE-06 | Phase 3 | Pending |
+| SCENE-01 | Phase 3 | Complete |
+| SCENE-02 | Phase 3 | Complete |
+| SCENE-03 | Phase 3 | Complete |
+| SCENE-04 | Phase 3 | Complete |
+| SCENE-05 | Phase 3 | Complete |
+| SCENE-06 | Phase 3 | Complete |
 | CAM-01 | Phase 4 | Complete |
 | CAM-02 | Phase 4 | Complete |
 | CAM-03 | Phase 4 | Complete |
@@ -134,6 +134,7 @@
 | NAV-03 | Phase 7 | Complete |
 | VIS-01 | Phase 3 | Complete |
 | VIS-02 | Phase 3 | Complete |
+
 | VIS-03 | Phase 7 | Complete |
 
 **Coverage:**
