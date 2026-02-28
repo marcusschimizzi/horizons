@@ -60,6 +60,11 @@ export function TaskDetail() {
   const rawInputDebounceRef = useRef<ReturnType<typeof setTimeout>>(undefined);
   const prevTaskIdRef = useRef<string | null>(null);
 
+  // --- Refinement state ---
+  const [refinementData, setRefinementData] = useState<{ clarifyingQuestion: string; suggestedTitle: string } | null>(null);
+  const [refinementResponse, setRefinementResponse] = useState('');
+  const [refinementLoading, setRefinementLoading] = useState(false);
+
   // Sync local state when task changes (keyed on task.id, not task.title/rawInput)
   useEffect(() => {
     if (task && task.id !== prevTaskIdRef.current) {
@@ -92,6 +97,42 @@ export function TaskDetail() {
       if (rawInputDebounceRef.current) clearTimeout(rawInputDebounceRef.current);
     };
   }, []);
+
+  // --- Load refinement data ---
+  useEffect(() => {
+    if (!task || !task.needsRefinement) {
+      setRefinementData(null);
+      setRefinementResponse('');
+      return;
+    }
+    // Try to parse stored prompt first
+    if (task.refinementPrompt) {
+      try {
+        const parsed = JSON.parse(task.refinementPrompt);
+        setRefinementData(parsed);
+        return;
+      } catch { /* fall through to fetch */ }
+    }
+    // Fetch from API if no stored prompt
+    let cancelled = false;
+    setRefinementLoading(true);
+    fetch('/api/refine', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ taskId: task.id }),
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (cancelled) return;
+        if (data.clarifyingQuestion) {
+          setRefinementData(data);
+          store?.getState().updateTask(task.id, { refinementPrompt: JSON.stringify(data) });
+        }
+      })
+      .catch(() => { /* best effort */ })
+      .finally(() => { if (!cancelled) setRefinementLoading(false); });
+    return () => { cancelled = true; };
+  }, [task?.id, task?.needsRefinement, task?.refinementPrompt, store]);
 
   // --- Title auto-save ---
   const saveTitle = useCallback((value: string) => {
@@ -232,7 +273,6 @@ export function TaskDetail() {
 
   const handleReschedule = useCallback((newHorizon: Horizon) => {
     if (!store || !task) return;
-    if (newHorizon === task.horizon) return;
 
     const { earliest, latest } = horizonToDateRange(newHorizon);
 
@@ -280,6 +320,35 @@ export function TaskDetail() {
       });
     });
   }, [store, task]);
+
+  const handleRefinementSubmit = useCallback(async () => {
+    if (!task || !refinementResponse.trim() || refinementLoading) return;
+    setRefinementLoading(true);
+    try {
+      const res = await fetch('/api/refine', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ taskId: task.id, userResponse: refinementResponse.trim() }),
+      });
+      const data = await res.json();
+      if (data.title) {
+        store?.getState().updateTask(task.id, {
+          title: data.title,
+          rawInput: data.rawInput || task.rawInput,
+          needsRefinement: false,
+          refinementPrompt: null,
+        });
+        setLocalTitle(data.title);
+        if (data.rawInput) setLocalRawInput(data.rawInput);
+        setRefinementData(null);
+        setRefinementResponse('');
+      }
+    } catch {
+      // best effort
+    } finally {
+      setRefinementLoading(false);
+    }
+  }, [task, refinementResponse, refinementLoading, store]);
 
   // --- Styles ---
 
@@ -492,6 +561,62 @@ export function TaskDetail() {
     cursor: 'pointer',
   };
 
+  const driftPromptStyle: React.CSSProperties = {
+    margin: '0 20px 12px 20px',
+    padding: 14,
+    background: 'rgba(245, 158, 11, 0.08)',
+    border: '1px solid rgba(245, 158, 11, 0.2)',
+    borderRadius: 10,
+    fontFamily: 'monospace',
+    color: '#f59e0b',
+  };
+
+  const driftActionBtnStyle = (color: string): React.CSSProperties => ({
+    padding: '6px 14px',
+    borderRadius: 8,
+    border: `1px solid ${color}44`,
+    background: `${color}15`,
+    color: color,
+    fontSize: 12,
+    fontWeight: 600,
+    fontFamily: 'monospace',
+    cursor: 'pointer',
+  });
+
+  const refinementSectionStyle: React.CSSProperties = {
+    margin: '0 20px 12px 20px',
+    padding: 14,
+    background: 'rgba(136, 170, 255, 0.08)',
+    border: '1px solid rgba(136, 170, 255, 0.2)',
+    borderRadius: 10,
+    fontFamily: 'monospace',
+  };
+
+  const refinementInputStyle: React.CSSProperties = {
+    flex: 1,
+    padding: '8px 12px',
+    background: 'rgba(30, 30, 40, 0.5)',
+    border: '1px solid rgba(136, 170, 255, 0.2)',
+    borderRadius: 8,
+    color: '#e2e8f0',
+    fontSize: 13,
+    fontFamily: 'monospace',
+    outline: 'none',
+  };
+
+  const refinementSubmitStyle: React.CSSProperties = {
+    padding: '8px 16px',
+    borderRadius: 8,
+    border: '1px solid rgba(136, 170, 255, 0.3)',
+    background: 'rgba(136, 170, 255, 0.15)',
+    color: '#88aaff',
+    fontSize: 12,
+    fontWeight: 600,
+    fontFamily: 'monospace',
+    cursor: 'pointer',
+    flexShrink: 0,
+  };
+
   const horizonColor = task ? (HORIZON_COLORS[task.horizon] || '#64748b') : '#64748b';
   const horizonLabel = task ? (HORIZON_LABELS[task.horizon] || task.horizon) : '';
 
@@ -537,6 +662,42 @@ export function TaskDetail() {
               )}
             </div>
 
+            {/* Refinement section */}
+            {task.needsRefinement && (
+              <div style={refinementSectionStyle}>
+                {refinementLoading ? (
+                  <div style={{ fontSize: 12, color: '#64748b', fontStyle: 'italic' }}>
+                    Generating refinement prompt...
+                  </div>
+                ) : refinementData ? (
+                  <>
+                    <div style={{ fontSize: 12, color: '#88aaff', marginBottom: 8, lineHeight: 1.5 }}>
+                      {refinementData.clarifyingQuestion}
+                    </div>
+                    <div style={{ fontSize: 11, color: '#64748b', marginBottom: 10 }}>
+                      Suggested: &ldquo;{refinementData.suggestedTitle}&rdquo;
+                    </div>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <input
+                        style={refinementInputStyle}
+                        value={refinementResponse}
+                        onChange={(e) => setRefinementResponse(e.target.value)}
+                        placeholder="Type your response..."
+                        onKeyDown={(e) => { if (e.key === 'Enter') handleRefinementSubmit(); }}
+                      />
+                      <button
+                        style={refinementSubmitStyle}
+                        onClick={handleRefinementSubmit}
+                        disabled={!refinementResponse.trim() || refinementLoading}
+                      >
+                        Refine
+                      </button>
+                    </div>
+                  </>
+                ) : null}
+              </div>
+            )}
+
             <textarea
               style={textareaStyle}
               value={localRawInput}
@@ -575,6 +736,26 @@ export function TaskDetail() {
                 })}
               </div>
             </div>
+
+            {/* Drift accountability prompt */}
+            {task.driftCount >= 3 && actionResult === null && (
+              <div style={driftPromptStyle}>
+                <div style={{ fontSize: 13, marginBottom: 10, lineHeight: 1.5 }}>
+                  This has moved {task.driftCount} times. What&apos;s in the way?
+                </div>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button style={driftActionBtnStyle('#3b82f6')} onClick={() => handleReschedule(task.horizon)}>
+                    Recommit
+                  </button>
+                  <button style={driftActionBtnStyle('#64748b')} onClick={() => handleReschedule('someday')}>
+                    Snooze
+                  </button>
+                  <button style={driftActionBtnStyle('#ef4444')} onClick={handleDrop}>
+                    Drop
+                  </button>
+                </div>
+              </div>
+            )}
 
             <div style={actionBarStyle}>
               <button
