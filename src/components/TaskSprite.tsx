@@ -43,7 +43,12 @@ export function TaskSprite({ task, position, isNew }: TaskSpriteProps) {
   const dissolvingRef = useRef<'completing' | 'dropping' | null>(null);
   const dissolveStartRef = useRef<number | null>(null);
 
+  // Refs for indicator ring materials
+  const refinementRingRef = useRef<THREE.MeshBasicMaterial>(null);
+  const deadlineRingRef = useRef<THREE.MeshBasicMaterial>(null);
+
   // Derive glow color from first tag, shifted toward ethereal tones
+  // More drift = more desaturation toward ethereal target
   const glowColor = useMemo(() => {
     const firstTag = task.tags?.[0];
     const baseHex =
@@ -52,10 +57,11 @@ export function TaskSprite({ task, position, isNew }: TaskSpriteProps) {
         : DEFAULT_COLOR;
 
     const color = new THREE.Color(baseHex);
-    color.lerp(ETHEREAL_TARGET, 0.25);
+    const driftLerp = Math.min(0.25 + (task.driftCount ?? 0) * 0.1, 0.7);
+    color.lerp(ETHEREAL_TARGET, driftLerp);
     color.multiplyScalar(SCENE_CONSTANTS.spriteEmissiveMultiplier);
     return color;
-  }, [task.tags]);
+  }, [task.tags, task.driftCount]);
 
   // Derive radius from driftCount — subtle scaling up to ~30% at 5 drifts
   const radius = useMemo(() => {
@@ -103,6 +109,24 @@ export function TaskSprite({ task, position, isNew }: TaskSpriteProps) {
       return;
     }
 
+    // Drift-based opacity reduction in steady state (not animating)
+    if (!isNew) {
+      const driftReduction = Math.min((task.driftCount ?? 0) * 0.08, 0.5);
+      materialRef.current.opacity = Math.max(0.4, SCENE_CONSTANTS.spriteOpacity - driftReduction);
+    }
+
+    // Refinement ring breathing pulse (~0.3 Hz)
+    if (refinementRingRef.current && task.needsRefinement) {
+      refinementRingRef.current.opacity = 0.2 + 0.4 * (0.5 + 0.5 * Math.sin(performance.now() * 0.002));
+      invalidate();
+    }
+
+    // Deadline ring breathing pulse (~0.25 Hz)
+    if (deadlineRingRef.current && task.hardDeadline) {
+      deadlineRingRef.current.opacity = 0.2 + 0.3 * (0.5 + 0.5 * Math.sin(performance.now() * 0.0015));
+      invalidate();
+    }
+
     // Entrance animation — only runs while isNew
     if (!isNew) return;
 
@@ -146,6 +170,30 @@ export function TaskSprite({ task, position, isNew }: TaskSpriteProps) {
               opacity={isNew ? 0 : SCENE_CONSTANTS.spriteOpacity}
             />
           </mesh>
+          {task.hardDeadline && (
+            <mesh>
+              <ringGeometry args={[radius * 1.2, radius * 1.35, 32]} />
+              <meshBasicMaterial
+                ref={deadlineRingRef}
+                color={new THREE.Color('#f59e0b')}
+                toneMapped={false}
+                transparent
+                opacity={0.3}
+              />
+            </mesh>
+          )}
+          {task.needsRefinement && (
+            <mesh>
+              <ringGeometry args={[radius * 1.4, radius * 1.6, 32]} />
+              <meshBasicMaterial
+                ref={refinementRingRef}
+                color={new THREE.Color('#88aaff')}
+                toneMapped={false}
+                transparent
+                opacity={0.3}
+              />
+            </mesh>
+          )}
         </Billboard>
       </group>
     </group>
