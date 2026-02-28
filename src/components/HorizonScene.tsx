@@ -1,13 +1,13 @@
 'use client';
 
-import { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
 import { Stars } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import * as THREE from 'three';
 
 import { SCENE_CONSTANTS } from '@/lib/scene-constants';
-import { TaskStoreContext, useTasksWithHorizon } from '@/stores/task-store';
+import { TaskStoreContext, useTasksWithHorizon, useTaskStore } from '@/stores/task-store';
 import { getTaskPosition, applyOverlapAvoidance } from '@/lib/spatial';
 import { TaskNode } from './TaskNode';
 import { CompletionBurst } from './CompletionBurst';
@@ -17,6 +17,7 @@ import { SnapToPresent } from './SnapToPresent';
 import { InputBubble } from './InputBubble';
 import { TaskDetail } from './TaskDetail';
 import { DriftNotification } from './DriftNotification';
+import { ListView } from './ListView';
 
 // O(1) lookup for card horizons (same set as TaskNode, used for breakdown count)
 const cardHorizonsSet = new Set<string>(SCENE_CONSTANTS.cardHorizons);
@@ -175,29 +176,78 @@ interface HorizonSceneProps {
 
 export default function HorizonScene({ driftSummary }: HorizonSceneProps) {
   const tasks = useTasksWithHorizon();
+  const showListView = useTaskStore((s) => s.showListView);
+  const toggleListView = useTaskStore((s) => s.toggleListView);
 
   const taskBreakdown = useMemo(() => {
     const cards = tasks.filter((t) => cardHorizonsSet.has(t.horizon)).length;
     return { total: tasks.length, cards, sprites: tasks.length - cards };
   }, [tasks]);
 
+  // L key toggles between 3D scene and list view
+  const handleKeydown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.key === 'l' || e.key === 'L') {
+        toggleListView();
+      }
+    },
+    [toggleListView],
+  );
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeydown);
+    return () => window.removeEventListener('keydown', handleKeydown);
+  }, [handleKeydown]);
+
   return (
     <>
-      <Canvas
-        frameloop="demand"
-        camera={{ position: [0, 0, SCENE_CONSTANTS.cameraRestZ], fov: 60 }}
+      {/* Toggle button */}
+      <button
+        onClick={toggleListView}
         style={{
-          width: '100%',
-          height: '100%',
-          background: SCENE_CONSTANTS.background,
+          position: 'fixed',
+          top: 20,
+          left: 20,
+          zIndex: 100,
+          padding: '8px 14px',
+          background: 'rgba(20, 20, 30, 0.8)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          border: '1px solid rgba(148, 163, 184, 0.2)',
+          borderRadius: 8,
+          color: '#94a3b8',
+          fontSize: 12,
+          fontWeight: 600,
+          fontFamily: 'monospace',
+          cursor: 'pointer',
         }}
       >
-        <SceneContents taskCount={tasks.length} />
-      </Canvas>
+        {showListView ? '3D View' : 'List View'}
+      </button>
+
+      {/* Canvas wrapper — hidden (not unmounted) when list view active */}
+      <div style={{ display: showListView ? 'none' : 'contents' }}>
+        <Canvas
+          frameloop="demand"
+          camera={{ position: [0, 0, SCENE_CONSTANTS.cameraRestZ], fov: 60 }}
+          style={{
+            width: '100%',
+            height: '100%',
+            background: SCENE_CONSTANTS.background,
+          }}
+        >
+          <SceneContents taskCount={tasks.length} />
+        </Canvas>
+      </div>
+
+      {/* List view */}
+      {showListView && <ListView />}
+
       {driftSummary && driftSummary.count > 0 && (
         <DriftNotification count={driftSummary.count} />
       )}
-      <SnapToPresent />
+      {!showListView && <SnapToPresent />}
       <InputBubble />
       <TaskDetail />
       <DebugOverlay taskBreakdown={taskBreakdown} />
