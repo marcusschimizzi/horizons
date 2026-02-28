@@ -5,10 +5,11 @@ import { Html } from '@react-three/drei';
 import type { Task } from '@/types/task';
 import { SCENE_CONSTANTS } from '@/lib/scene-constants';
 import { TaskStoreContext, useIsCompleting, useIsDropping } from '@/stores/task-store';
+import type { Horizon } from '@/lib/horizons';
 import { lerpHex } from '@/lib/color';
 
 // Horizon depth: 0 = immediate (full ink), 1 = someday (pencil)
-const HORIZON_DEPTH: Record<string, number> = {
+const HORIZON_DEPTH: Record<Horizon, number> = {
   'immediate':    0.0,
   'this-week':    0.2,
   'this-month':   0.4,
@@ -64,7 +65,7 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
       ? 'refinementPulse 3s ease-in-out infinite'
       : undefined;
 
-  const depth = HORIZON_DEPTH[task.horizon] ?? 0;
+  const depth = HORIZON_DEPTH[task.horizon];
   const inkColor = lerpHex('#1a1605', '#b8ac9e', depth);
   const inkBorder = lerpHex('#8b7d6b', '#d4ccc4', depth);
   const shadowAlpha = (0.12 - depth * 0.10).toFixed(2);
@@ -121,12 +122,12 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
         <>
           <style>{`
             @keyframes refinementPulse {
-              0%, 100% { box-shadow: 2px 3px 8px rgba(26,22,5,0.12), 0 0 0 2px rgba(30,58,95,0.15); }
-              50% { box-shadow: 2px 3px 8px rgba(26,22,5,0.12), 0 0 0 3px rgba(30,58,95,0.35); }
+              0%, 100% { box-shadow: 2px 3px 8px rgba(26,22,5,${shadowAlpha}), 0 0 0 2px rgba(30,58,95,0.15); }
+              50% { box-shadow: 2px 3px 8px rgba(26,22,5,${shadowAlpha}), 0 0 0 3px rgba(30,58,95,0.35); }
             }
             @keyframes deadlinePulse {
-              0%, 100% { box-shadow: 2px 3px 8px rgba(26,22,5,0.12), 0 0 0 2px rgba(124,58,43,0.15); }
-              50% { box-shadow: 2px 3px 8px rgba(26,22,5,0.12), 0 0 0 3px rgba(124,58,43,0.35); }
+              0%, 100% { box-shadow: 2px 3px 8px rgba(26,22,5,${shadowAlpha}), 0 0 0 2px rgba(124,58,43,0.15); }
+              50% { box-shadow: 2px 3px 8px rgba(26,22,5,${shadowAlpha}), 0 0 0 3px rgba(124,58,43,0.35); }
             }
           `}</style>
           <div style={cardStyle} onClick={() => store?.getState().selectTask(task.id)}>
