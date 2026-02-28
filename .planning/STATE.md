@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-26)
 ## Current Position
 
 Phase: 7 of 7 (Polish)
-Plan: 3 of 4 in phase
-Status: In progress
-Last activity: 2026-02-27 — Completed 07-03-PLAN.md (Refine Route and TaskDetail Refinement UI)
+Plan: 4 of 4 in phase
+Status: Phase complete
+Last activity: 2026-02-27 — Completed 07-04-PLAN.md (List View and Toggle Integration)
 
-Progress: [█████████████████████████████░] ~95% (20 plans of 21 total)
+Progress: [██████████████████████████████] 100% (21 plans of 21 total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 20
+- Total plans completed: 21
 - Average duration: 2 min
-- Total execution time: 49 min
+- Total execution time: 52 min
 
 **By Phase:**
 
@@ -33,10 +33,10 @@ Progress: [███████████████████████
 | 04-camera | 2/2 | 5 min | 3 min |
 | 05-capture | 3/3 | ~20 min | ~7 min |
 | 06-task-interactions | 3/3 | 9 min | 3 min |
-| 07-polish | 3/4 | 7 min | 2 min |
+| 07-polish | 4/4 | 10 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 06-03 (3 min), 07-01 (2 min), 07-02 (2 min), 07-03 (3 min)
+- Last 5 plans: 07-01 (2 min), 07-02 (2 min), 07-03 (3 min), 07-04 (3 min)
 - Trend: consistent
 
 *Updated after each plan completion*
@@ -113,6 +113,11 @@ Recent decisions affecting current work:
 - Drift desaturation uses graduated lerp from 0.25 base to 0.7 max toward ETHEREAL_TARGET
 - handleReschedule same-horizon guard removed to allow Recommit action (resetting dates within same horizon)
 - Refinement fetch useEffect uses cancellation flag to prevent stale responses updating wrong task
+- List view toggle button z-index 100, positioned fixed top:20 left:20
+- Canvas display:none (not unmount) for list view — preserves WebGL context
+- SnapToPresent hidden in list view (camera navigation irrelevant)
+- ListView quick complete skips undo window — list view is for fast triage
+- display:'contents' for visible Canvas wrapper — preserves layout as if wrapper doesn't exist
 
 ### Pending Todos
 
@@ -126,5 +131,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 07-03-PLAN.md (Refine Route and TaskDetail Refinement UI)
+Stopped at: Completed 07-04-PLAN.md (List View and Toggle Integration) - ALL PHASES COMPLETE
 Resume file: None
