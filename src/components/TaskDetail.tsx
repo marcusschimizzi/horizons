@@ -5,6 +5,7 @@ import { useSelectedTask, useTaskStore, TaskStoreContext } from '@/stores/task-s
 import type { TaskRow } from '@/types/task';
 import type { Horizon } from '@/lib/horizons';
 import { getZDepth } from '@/lib/horizons';
+import { getTaskPosition } from '@/lib/spatial';
 import { horizonToDateRange } from '@/lib/horizon-dates';
 import { cameraStore } from '@/stores/camera-store';
 import { SCENE_CONSTANTS } from '@/lib/scene-constants';
@@ -64,6 +65,17 @@ export function TaskDetail() {
   const [refinementData, setRefinementData] = useState<{ clarifyingQuestion: string; suggestedTitle: string } | null>(null);
   const [refinementResponse, setRefinementResponse] = useState('');
   const [refinementLoading, setRefinementLoading] = useState(false);
+
+  // Pan camera to task depth on selection
+  useEffect(() => {
+    if (!task) return;
+    const pos = getTaskPosition(task.id, task.horizon);
+    const targetZ = Math.max(
+      SCENE_CONSTANTS.farBoundary,
+      Math.min(SCENE_CONSTANTS.nearBoundary, pos.z + 10),
+    );
+    cameraStore.setState({ targetZ, velocity: 0, isAnimating: true });
+  }, [task?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Sync local state when task changes (keyed on task.id, not task.title/rawInput)
   useEffect(() => {

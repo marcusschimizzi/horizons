@@ -117,6 +117,7 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
       <Html
         center
         distanceFactor={SCENE_CONSTANTS.htmlDistanceFactor}
+        zIndexRange={[0, 0]}
         style={{ pointerEvents: 'none' }}
       >
         <>
