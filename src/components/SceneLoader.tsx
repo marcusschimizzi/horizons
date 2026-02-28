@@ -49,6 +49,7 @@ function ErrorState() {
 interface SceneLoaderProps {
   initialTasks: TaskRow[];
   error?: boolean;
+  driftSummary?: { count: number } | null;
 }
 
 export default function SceneLoader({ initialTasks, error }: SceneLoaderProps) {
