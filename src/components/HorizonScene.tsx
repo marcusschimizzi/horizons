@@ -16,6 +16,7 @@ import { DebugOverlay } from './DebugOverlay';
 import { SnapToPresent } from './SnapToPresent';
 import { InputBubble } from './InputBubble';
 import { TaskDetail } from './TaskDetail';
+import { DriftNotification } from './DriftNotification';
 
 // O(1) lookup for card horizons (same set as TaskNode, used for breakdown count)
 const cardHorizonsSet = new Set<string>(SCENE_CONSTANTS.cardHorizons);
@@ -43,15 +44,17 @@ function SceneInvalidator() {
 // FogSetup — imperatively sets fog to work around React 19 declarative issues
 // ---------------------------------------------------------------------------
 
-function FogSetup() {
+function FogSetup({ taskCount }: { taskCount: number }) {
   const scene = useThree((state) => state.scene);
 
   useEffect(() => {
-    scene.fog = new THREE.FogExp2(SCENE_CONSTANTS.fogColor, SCENE_CONSTANTS.fogDensity);
+    const baseDensity = SCENE_CONSTANTS.fogDensity;
+    const adaptiveDensity = baseDensity + Math.min(taskCount * 0.0002, 0.008);
+    scene.fog = new THREE.FogExp2(SCENE_CONSTANTS.fogColor, adaptiveDensity);
     return () => {
       scene.fog = null;
     };
-  }, [scene]);
+  }, [scene, taskCount]);
 
   return null;
 }
@@ -132,11 +135,11 @@ function TaskNodes() {
 // SceneContents — everything rendered inside the Canvas
 // ---------------------------------------------------------------------------
 
-function SceneContents() {
+function SceneContents({ taskCount }: { taskCount: number }) {
   return (
     <>
       <color attach="background" args={[SCENE_CONSTANTS.background]} />
-      <FogSetup />
+      <FogSetup taskCount={taskCount} />
       <ambientLight intensity={SCENE_CONSTANTS.ambientIntensity} />
       <Stars
         radius={SCENE_CONSTANTS.starRadius}
@@ -166,7 +169,11 @@ function SceneContents() {
 // HorizonScene — the main exported component
 // ---------------------------------------------------------------------------
 
-export default function HorizonScene() {
+interface HorizonSceneProps {
+  driftSummary?: { count: number } | null;
+}
+
+export default function HorizonScene({ driftSummary }: HorizonSceneProps) {
   const tasks = useTasksWithHorizon();
 
   const taskBreakdown = useMemo(() => {
@@ -185,8 +192,11 @@ export default function HorizonScene() {
           background: SCENE_CONSTANTS.background,
         }}
       >
-        <SceneContents />
+        <SceneContents taskCount={tasks.length} />
       </Canvas>
+      {driftSummary && driftSummary.count > 0 && (
+        <DriftNotification count={driftSummary.count} />
+      )}
       <SnapToPresent />
       <InputBubble />
       <TaskDetail />

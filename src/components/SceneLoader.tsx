@@ -52,7 +52,7 @@ interface SceneLoaderProps {
   driftSummary?: { count: number } | null;
 }
 
-export default function SceneLoader({ initialTasks, error }: SceneLoaderProps) {
+export default function SceneLoader({ initialTasks, error, driftSummary }: SceneLoaderProps) {
   if (error) {
     return <ErrorState />;
   }
@@ -60,7 +60,7 @@ export default function SceneLoader({ initialTasks, error }: SceneLoaderProps) {
   return (
     <TaskStoreProvider initialTasks={initialTasks}>
       <div className="h-screen w-screen overflow-hidden">
-        <HorizonScene />
+        <HorizonScene driftSummary={driftSummary} />
       </div>
     </TaskStoreProvider>
   );
