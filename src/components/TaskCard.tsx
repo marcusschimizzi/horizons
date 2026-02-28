@@ -5,6 +5,17 @@ import { Html } from '@react-three/drei';
 import type { Task } from '@/types/task';
 import { SCENE_CONSTANTS } from '@/lib/scene-constants';
 import { TaskStoreContext, useIsCompleting, useIsDropping } from '@/stores/task-store';
+import { lerpHex } from '@/lib/color';
+
+// Horizon depth: 0 = immediate (full ink), 1 = someday (pencil)
+const HORIZON_DEPTH: Record<string, number> = {
+  'immediate':    0.0,
+  'this-week':    0.2,
+  'this-month':   0.4,
+  'this-quarter': 0.6,
+  'this-year':    0.8,
+  'someday':      1.0,
+};
 
 interface TaskCardProps {
   task: Task;
@@ -53,17 +64,22 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
       ? 'refinementPulse 3s ease-in-out infinite'
       : undefined;
 
+  const depth = HORIZON_DEPTH[task.horizon] ?? 0;
+  const inkColor = lerpHex('#1a1605', '#b8ac9e', depth);
+  const inkBorder = lerpHex('#8b7d6b', '#d4ccc4', depth);
+  const shadowAlpha = (0.12 - depth * 0.10).toFixed(2);
+
   const cardStyle: React.CSSProperties = {
     position: 'relative',
-    width: 200,
-    padding: '10px 14px',
+    width: 260,
+    padding: '12px 16px',
     background: '#fdf8f0',
-    border: '1px solid #8b7d6b',
+    border: `1px solid ${inkBorder}`,
     borderRadius: 2,
-    boxShadow: '2px 3px 8px rgba(26, 22, 5, 0.12)',
-    color: '#1a1605',
+    boxShadow: `2px 3px 8px rgba(26, 22, 5, ${shadowAlpha})`,
+    color: inkColor,
     fontFamily: 'var(--font-serif)',
-    fontSize: 13,
+    fontSize: 14,
     lineHeight: 1.4,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
