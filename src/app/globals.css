@@ -1,15 +1,63 @@
 @import "tailwindcss";
 
 @theme {
-  --color-horizon-immediate: #ef4444;
-  --color-horizon-this-week: #f59e0b;
-  --color-horizon-this-month: #3b82f6;
-  --color-horizon-this-quarter: #8b5cf6;
-  --color-horizon-this-year: #06b6d4;
-  --color-horizon-someday: #6b7280;
+  /* Horizon ink colors */
+  --color-horizon-immediate: #c0392b;
+  --color-horizon-this-week: #e76b2e;
+  --color-horizon-this-month: #1e3a5f;
+  --color-horizon-this-quarter: #2d5016;
+  --color-horizon-this-year: #4a2c6b;
+  --color-horizon-someday: #8b7d6b;
 
-  --color-bg-primary: #0a0a0f;
-  --color-bg-secondary: #12121a;
-  --color-text-primary: #e2e8f0;
-  --color-text-secondary: #94a3b8;
+  /* Base palette — ink on parchment */
+  --color-bg-primary: #f5f0e8;
+  --color-bg-secondary: #ede8df;
+  --color-bg-panel: #fdf8f0;
+  --color-text-primary: #1a1605;
+  --color-text-secondary: #5c5344;
+  --color-text-muted: #9c8f7e;
+  --color-border: #c5baa8;
+  --color-border-strong: #8b7d6b;
+
+  /* Tag ink colors */
+  --color-tag-work: #1e3a5f;
+  --color-tag-personal: #7c3a2b;
+  --color-tag-health: #2d5016;
+  --color-tag-finance: #4a2c6b;
+  --color-tag-home: #7c4a1a;
+  --color-tag-social: #8b1a3c;
+
+  /* Semantic ink colors */
+  --color-refinement: #1e3a5f;
+  --color-drift: #7c3a2b;
+  --color-done: #2d5016;
+  --color-drop: #c0392b;
+}
+
+/* Paper texture overlay — toggled via body class */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+body.texture-dots::before {
+  background-image: radial-gradient(circle, #c5baa8 1px, transparent 1px);
+  background-size: 20px 20px;
+  opacity: 0.4;
+}
+
+body.texture-ruled::before {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 21px,
+    #c5baa8 21px,
+    #c5baa8 22px
+  );
+  opacity: 0.35;
 }

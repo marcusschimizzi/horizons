@@ -2,8 +2,6 @@
 
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useThree } from '@react-three/fiber';
-import { Stars } from '@react-three/drei';
-import { EffectComposer, Bloom } from '@react-three/postprocessing';
 import * as THREE from 'three';
 
 import { SCENE_CONSTANTS } from '@/lib/scene-constants';
@@ -18,6 +16,7 @@ import { InputBubble } from './InputBubble';
 import { TaskDetail } from './TaskDetail';
 import { DriftNotification } from './DriftNotification';
 import { ListView } from './ListView';
+import { TextureToggle } from './TextureToggle';
 
 // O(1) lookup for card horizons (same set as TaskNode, used for breakdown count)
 const cardHorizonsSet = new Set<string>(SCENE_CONSTANTS.cardHorizons);
@@ -142,26 +141,10 @@ function SceneContents({ taskCount }: { taskCount: number }) {
       <color attach="background" args={[SCENE_CONSTANTS.background]} />
       <FogSetup taskCount={taskCount} />
       <ambientLight intensity={SCENE_CONSTANTS.ambientIntensity} />
-      <Stars
-        radius={SCENE_CONSTANTS.starRadius}
-        depth={SCENE_CONSTANTS.starDepth}
-        count={SCENE_CONSTANTS.starCount}
-        factor={SCENE_CONSTANTS.starFactor}
-        saturation={0}
-        speed={0}
-        fade
-      />
+      <directionalLight position={[5, 10, 5]} intensity={0.4} color="#fff8f0" />
       <CameraRig />
       <TaskNodes />
       <SceneInvalidator />
-      <EffectComposer>
-        <Bloom
-          mipmapBlur={SCENE_CONSTANTS.bloomMipmapBlur}
-          luminanceThreshold={SCENE_CONSTANTS.bloomLuminanceThreshold}
-          luminanceSmoothing={SCENE_CONSTANTS.bloomLuminanceSmoothing}
-          intensity={SCENE_CONSTANTS.bloomIntensity}
-        />
-      </EffectComposer>
     </>
   );
 }
@@ -211,15 +194,13 @@ export default function HorizonScene({ driftSummary }: HorizonSceneProps) {
           left: 20,
           zIndex: 100,
           padding: '8px 14px',
-          background: 'rgba(20, 20, 30, 0.8)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
-          border: '1px solid rgba(148, 163, 184, 0.2)',
-          borderRadius: 8,
-          color: '#94a3b8',
+          background: '#fdf8f0',
+          border: '1px solid #8b7d6b',
+          borderRadius: 4,
+          color: '#5c5344',
           fontSize: 12,
           fontWeight: 600,
-          fontFamily: 'monospace',
+          fontFamily: 'var(--font-geist-mono), monospace',
           cursor: 'pointer',
         }}
       >
@@ -248,6 +229,7 @@ export default function HorizonScene({ driftSummary }: HorizonSceneProps) {
         <DriftNotification count={driftSummary.count} />
       )}
       {!showListView && <SnapToPresent />}
+      <TextureToggle />
       <InputBubble />
       <TaskDetail />
       <DebugOverlay taskBreakdown={taskBreakdown} />

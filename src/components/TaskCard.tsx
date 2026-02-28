@@ -57,14 +57,14 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
     position: 'relative',
     width: 200,
     padding: '10px 14px',
-    background: 'rgba(18, 18, 26, 0.75)',
-    backdropFilter: 'blur(8px)',
-    WebkitBackdropFilter: 'blur(8px)',
-    border: '1px solid rgba(148, 163, 184, 0.15)',
-    borderRadius: 8,
-    color: '#e2e8f0',
+    background: '#fdf8f0',
+    border: '1px solid #8b7d6b',
+    borderRadius: 2,
+    boxShadow: '2px 3px 8px rgba(26, 22, 5, 0.12)',
+    color: '#1a1605',
+    fontFamily: 'var(--font-serif)',
     fontSize: 13,
-    lineHeight: 1.3,
+    lineHeight: 1.4,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -76,14 +76,8 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
     ...(isNew
       ? { transition: 'opacity 0.5s ease-out, transform 0.5s ease-out' }
       : {}),
-    // Pulse animation for hardDeadline (amber) or needsRefinement (blue)
+    // Pulse animation for hardDeadline or needsRefinement
     ...(pulseAnimation ? { animation: pulseAnimation } : {}),
-    // Drift desaturation
-    ...(isDrifted
-      ? {
-          filter: `saturate(${Math.max(0.3, 1 - task.driftCount * 0.15)})`,
-        }
-      : {}),
     // Completion dissolution: fade + shrink
     ...(isCompleting
       ? {
@@ -111,12 +105,12 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
         <>
           <style>{`
             @keyframes refinementPulse {
-              0%, 100% { box-shadow: 0 0 4px rgba(136, 170, 255, 0.2), inset 0 0 2px rgba(136, 170, 255, 0.1); }
-              50% { box-shadow: 0 0 12px rgba(136, 170, 255, 0.5), inset 0 0 4px rgba(136, 170, 255, 0.2); }
+              0%, 100% { box-shadow: 2px 3px 8px rgba(26,22,5,0.12), 0 0 0 2px rgba(30,58,95,0.15); }
+              50% { box-shadow: 2px 3px 8px rgba(26,22,5,0.12), 0 0 0 3px rgba(30,58,95,0.35); }
             }
             @keyframes deadlinePulse {
-              0%, 100% { box-shadow: 0 0 6px rgba(245, 158, 11, 0.3); }
-              50% { box-shadow: 0 0 14px rgba(245, 158, 11, 0.6), inset 0 0 4px rgba(245, 158, 11, 0.15); }
+              0%, 100% { box-shadow: 2px 3px 8px rgba(26,22,5,0.12), 0 0 0 2px rgba(124,58,43,0.15); }
+              50% { box-shadow: 2px 3px 8px rgba(26,22,5,0.12), 0 0 0 3px rgba(124,58,43,0.35); }
             }
           `}</style>
           <div style={cardStyle} onClick={() => store?.getState().selectTask(task.id)}>
@@ -126,8 +120,8 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
                 position: 'absolute',
                 top: -6,
                 right: -6,
-                background: 'rgba(245, 158, 11, 0.9)',
-                color: '#fff',
+                background: '#fdf8f0',
+                color: '#7c3a2b',
                 fontSize: 10,
                 fontWeight: 700,
                 borderRadius: '50%',
@@ -136,7 +130,8 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                border: '1.5px solid rgba(10, 10, 15, 0.8)',
+                border: '1.5px solid #7c3a2b',
+                fontFamily: 'var(--font-geist-mono), monospace',
               }}>
                 {task.driftCount}
               </span>
