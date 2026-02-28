@@ -132,13 +132,13 @@ Plans:
   3. Tasks flagged `needsRefinement: true` display a distinct pulse/ring indicator on their scene node; clicking them shows the Haiku-generated refinement prompt in the detail panel
   4. Responding to a refinement prompt in natural language calls Haiku, updates the task, and clears the flag
   5. Toggling the list view shows all tasks flat-grouped by horizon with tag/status/refinement filters and quick complete/drop/reschedule actions
-**Plans**: TBD
+**Plans**: 4 plans in 2 waves
 
 Plans:
-- [ ] 07-01: Drift tracking — on-load drift recalculation in RSC, `driftCount` increment, scene node indicator (ACCT-01, ACCT-02)
-- [ ] 07-02: Drift accountability prompt at 3+ drifts in TaskDetail (ACCT-03)
-- [ ] 07-03: Refinement flow — `needsRefinement` indicator on scene node, detail panel prompt display, `/api/refine` route, flag clearing (ACCT-04, ACCT-05, ACCT-06)
-- [ ] 07-04: `ListView.tsx` — toggle from 3D scene, flat task list grouped by horizon, filter controls, quick actions (NAV-01, NAV-02, NAV-03)
+- [ ] 07-01-PLAN.md — RSC drift recalculation, double-count prevention, DriftNotification toast, adaptive fog (ACCT-01) (Wave 1)
+- [ ] 07-02-PLAN.md — TaskCard drift badge + needsRefinement pulse, TaskSprite drift opacity + refinement/deadline rings (ACCT-02, ACCT-04, VIS-03) (Wave 1)
+- [ ] 07-03-PLAN.md — /api/refine route, drift accountability prompt in TaskDetail, refinement UI (ACCT-03, ACCT-05, ACCT-06) (Wave 2)
+- [ ] 07-04-PLAN.md — ListView with toggle, horizon grouping, filters, quick actions (NAV-01, NAV-02, NAV-03) (Wave 2)
 
 ## Progress
 
