@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-26)
 
 **Core value:** The spatial view must make you feel your future — if the 3D scene doesn't feel meaningfully different from a list, nothing else matters.
-**Current focus:** Phase 7 — Polish (Not started)
+**Current focus:** Phase 7 — Polish (In progress)
 
 ## Current Position
 
-Phase: 6 of 7 (Task Interactions) — Complete
-Plan: Phase 7 not yet started
-Status: Phase 6 complete, Phase 7 ready
-Last activity: 2026-02-27 — Completed Phase 6 (Task Interactions)
+Phase: 7 of 7 (Polish)
+Plan: 1 of 4 in phase
+Status: In progress
+Last activity: 2026-02-27 — Completed 07-01-PLAN.md (Drift Recalculation and Notification)
 
-Progress: [██████████████████████████░] ~81% (17 plans of ~21 estimated total)
+Progress: [███████████████████████████░] ~86% (18 plans of 21 total)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 17
+- Total plans completed: 18
 - Average duration: 2 min
-- Total execution time: 42 min
+- Total execution time: 44 min
 
 **By Phase:**
 
@@ -33,9 +33,10 @@ Progress: [███████████████████████
 | 04-camera | 2/2 | 5 min | 3 min |
 | 05-capture | 3/3 | ~20 min | ~7 min |
 | 06-task-interactions | 3/3 | 9 min | 3 min |
+| 07-polish | 1/4 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 05-02 (2 min), 06-01 (2 min), 06-02 (4 min), 06-03 (3 min)
+- Last 5 plans: 06-01 (2 min), 06-02 (4 min), 06-03 (3 min), 07-01 (2 min)
 - Trend: consistent
 
 *Updated after each plan completion*
@@ -102,6 +103,11 @@ Recent decisions affecting current work:
 - damp3 position drift smooth time 0.4s for TaskNode animated group wrapper
 - Dirty refs prevent spurious PATCH on panel open — auto-save only fires when user has actually edited
 - Debounced auto-save pattern: 1s debounce + immediate save on blur for title and rawInput
+- RSC on-load drift check chosen over cron/client-mount (simplest approach, resolves architecture question)
+- targetDateLatest advanced by window duration (or 7-day minimum) to prevent double-counting
+- DriftNotification z-index 105 (above SnapToPresent 100, below InputBubble 110)
+- Bloom luminance threshold lowered from 1.0 to 0.15 for broader glow coverage
+- Adaptive fog density: baseDensity + min(taskCount * 0.0002, 0.008)
 
 ### Pending Todos
 
@@ -109,12 +115,11 @@ None.
 
 ### Blockers/Concerns
 
-- One open architecture question to resolve during future phase planning:
-  - Drift increment trigger — RSC on-load check (simplest) vs cron vs client mount. Decide before Phase 7.
+- RESOLVED: Drift increment trigger — RSC on-load check chosen (simplest). Implemented in 07-01.
 - RESOLVED: Haiku JSON reliability — using zodOutputFormat with messages.parse() (GA in SDK 0.78.0). No fallback to tool use needed.
 
 ## Session Continuity
 
 Last session: 2026-02-27
-Stopped at: Completed 06-03-PLAN.md (Reschedule + Edit actions — Phase 6 complete)
+Stopped at: Completed 07-01-PLAN.md (Drift Recalculation and Notification)
 Resume file: None
