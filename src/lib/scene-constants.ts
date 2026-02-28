@@ -14,9 +14,9 @@ export const SCENE_CONSTANTS = {
   starFactor: 2,
 
   // Bloom
-  bloomIntensity: 1.5,           // Starting value, tune visually
-  bloomLuminanceThreshold: 1,    // Only toneMapped=false materials glow
-  bloomLuminanceSmoothing: 0.025,
+  bloomIntensity: 1.8,           // Tuned: stronger glow through fog for depth hierarchy
+  bloomLuminanceThreshold: 0.15, // Lower threshold so more emissive surfaces catch bloom
+  bloomLuminanceSmoothing: 0.015, // Tighter smoothing for cleaner glow edges
   bloomMipmapBlur: true,
 
   // LOD (horizon-based categorical split)
