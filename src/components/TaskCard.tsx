@@ -46,7 +46,15 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
     ? Math.max(0.6, 1 - task.driftCount * 0.1)
     : 1;
 
+  // Determine animation: hardDeadline takes priority over needsRefinement
+  const pulseAnimation = hasDeadline
+    ? 'deadlinePulse 4s ease-in-out infinite'
+    : task.needsRefinement
+      ? 'refinementPulse 3s ease-in-out infinite'
+      : undefined;
+
   const cardStyle: React.CSSProperties = {
+    position: 'relative',
     width: 200,
     padding: '10px 14px',
     background: 'rgba(18, 18, 26, 0.75)',
@@ -68,13 +76,8 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
     ...(isNew
       ? { transition: 'opacity 0.5s ease-out, transform 0.5s ease-out' }
       : {}),
-    // Hard-deadline amber glow ring
-    ...(hasDeadline
-      ? {
-          boxShadow:
-            '0 0 8px rgba(245, 158, 11, 0.4), inset 0 0 4px rgba(245, 158, 11, 0.1)',
-        }
-      : {}),
+    // Pulse animation for hardDeadline (amber) or needsRefinement (blue)
+    ...(pulseAnimation ? { animation: pulseAnimation } : {}),
     // Drift desaturation
     ...(isDrifted
       ? {
@@ -105,7 +108,41 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
         distanceFactor={SCENE_CONSTANTS.htmlDistanceFactor}
         style={{ pointerEvents: 'none' }}
       >
-        <div style={cardStyle} onClick={() => store?.getState().selectTask(task.id)}>{task.title}</div>
+        <>
+          <style>{`
+            @keyframes refinementPulse {
+              0%, 100% { box-shadow: 0 0 4px rgba(136, 170, 255, 0.2), inset 0 0 2px rgba(136, 170, 255, 0.1); }
+              50% { box-shadow: 0 0 12px rgba(136, 170, 255, 0.5), inset 0 0 4px rgba(136, 170, 255, 0.2); }
+            }
+            @keyframes deadlinePulse {
+              0%, 100% { box-shadow: 0 0 6px rgba(245, 158, 11, 0.3); }
+              50% { box-shadow: 0 0 14px rgba(245, 158, 11, 0.6), inset 0 0 4px rgba(245, 158, 11, 0.15); }
+            }
+          `}</style>
+          <div style={cardStyle} onClick={() => store?.getState().selectTask(task.id)}>
+            {task.title}
+            {isDrifted && (
+              <span style={{
+                position: 'absolute',
+                top: -6,
+                right: -6,
+                background: 'rgba(245, 158, 11, 0.9)',
+                color: '#fff',
+                fontSize: 10,
+                fontWeight: 700,
+                borderRadius: '50%',
+                width: 18,
+                height: 18,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: '1.5px solid rgba(10, 10, 15, 0.8)',
+              }}>
+                {task.driftCount}
+              </span>
+            )}
+          </div>
+        </>
       </Html>
     </group>
   );
