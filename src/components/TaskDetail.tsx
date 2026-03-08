@@ -66,15 +66,19 @@ export function TaskDetail() {
   const [refinementResponse, setRefinementResponse] = useState('');
   const [refinementLoading, setRefinementLoading] = useState(false);
 
-  // Pan camera to task depth on selection
+  // Pan camera to task position (X/Y/Z) on selection; reset on deselect
   useEffect(() => {
-    if (!task) return;
+    if (!task) {
+      cameraStore.getState().setPan(0, 0);
+      return;
+    }
     const pos = getTaskPosition(task.id, task.horizon);
     const targetZ = Math.max(
       SCENE_CONSTANTS.farBoundary,
       Math.min(SCENE_CONSTANTS.nearBoundary, pos.z + 10),
     );
     cameraStore.setState({ targetZ, velocity: 0, isAnimating: true });
+    cameraStore.getState().setPan(pos.x, pos.y);
   }, [task?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Sync local state when task changes (keyed on task.id, not task.title/rawInput)
