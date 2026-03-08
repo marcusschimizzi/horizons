@@ -28,12 +28,12 @@ const HORIZON_LABELS: Record<string, string> = {
 };
 
 const HORIZON_COLORS: Record<string, string> = {
-  'immediate': '#ef4444',
-  'this-week': '#f97316',
-  'this-month': '#eab308',
-  'this-quarter': '#22c55e',
-  'this-year': '#3b82f6',
-  'someday': '#8b5cf6',
+  'immediate': '#c0392b',
+  'this-week': '#e76b2e',
+  'this-month': '#1e3a5f',
+  'this-quarter': '#2d5016',
+  'this-year': '#4a2c6b',
+  'someday': '#8b7d6b',
 };
 
 const TAG_OPTIONS = ['work', 'personal', 'health', 'finance', 'home', 'social'] as const;
@@ -145,9 +145,10 @@ export function ListView() {
         position: 'fixed',
         inset: 0,
         zIndex: 1,
-        background: '#0a0a0f',
+        background: '#f5f0e8',
+        color: '#1a1605',
         overflowY: 'auto',
-        fontFamily: 'monospace',
+        fontFamily: 'var(--font-geist-mono), monospace',
       }}
     >
       {/* Filter bar */}
@@ -155,8 +156,8 @@ export function ListView() {
         style={{
           position: 'sticky',
           top: 0,
-          background: '#0a0a0f',
-          borderBottom: '1px solid rgba(148,163,184,0.1)',
+          background: '#ede8df',
+          borderBottom: '1px solid #c5baa8',
           padding: '60px 20px 12px 20px',
           display: 'flex',
           flexWrap: 'wrap',
@@ -170,12 +171,12 @@ export function ListView() {
             onClick={() => toggleTagFilter(tag)}
             style={{
               padding: '4px 10px',
-              borderRadius: 20,
-              border: `1px solid ${listFilters.tags.has(tag) ? '#3b82f6' : 'rgba(148,163,184,0.2)'}`,
-              background: listFilters.tags.has(tag) ? 'rgba(59,130,246,0.15)' : 'transparent',
-              color: listFilters.tags.has(tag) ? '#3b82f6' : '#64748b',
+              borderRadius: 2,
+              border: `1px solid ${listFilters.tags.has(tag) ? '#5c5344' : '#c5baa8'}`,
+              background: listFilters.tags.has(tag) ? '#5c5344' : 'transparent',
+              color: listFilters.tags.has(tag) ? '#f5f0e8' : '#5c5344',
               fontSize: 11,
-              fontFamily: 'monospace',
+              fontFamily: 'var(--font-geist-mono), monospace',
               cursor: 'pointer',
             }}
           >
@@ -186,30 +187,30 @@ export function ListView() {
           onClick={toggleRefinementFilter}
           style={{
             padding: '4px 10px',
-            borderRadius: 20,
-            border: `1px solid ${listFilters.needsRefinement === true ? '#88aaff' : 'rgba(148,163,184,0.2)'}`,
-            background: listFilters.needsRefinement === true ? 'rgba(136,170,255,0.15)' : 'transparent',
-            color: listFilters.needsRefinement === true ? '#88aaff' : '#64748b',
+            borderRadius: 2,
+            border: `1px solid ${listFilters.needsRefinement === true ? '#1e3a5f' : '#c5baa8'}`,
+            background: listFilters.needsRefinement === true ? '#1e3a5f' : 'transparent',
+            color: listFilters.needsRefinement === true ? '#f5f0e8' : '#5c5344',
             fontSize: 11,
-            fontFamily: 'monospace',
+            fontFamily: 'var(--font-geist-mono), monospace',
             cursor: 'pointer',
           }}
         >
           needs refinement
         </button>
-        <span style={{ width: 1, background: 'rgba(148,163,184,0.15)', alignSelf: 'stretch', margin: '0 4px' }} />
+        <span style={{ width: 1, background: '#c5baa8', alignSelf: 'stretch', margin: '0 4px' }} />
         {HORIZON_ORDER.map((h) => (
           <button
             key={h}
             onClick={() => toggleHorizonFilter(h)}
             style={{
               padding: '4px 10px',
-              borderRadius: 20,
-              border: `1px solid ${listFilters.horizons.has(h) ? HORIZON_COLORS[h] : 'rgba(148,163,184,0.2)'}`,
-              background: listFilters.horizons.has(h) ? `${HORIZON_COLORS[h]}18` : 'transparent',
-              color: listFilters.horizons.has(h) ? HORIZON_COLORS[h] : '#64748b',
+              borderRadius: 2,
+              border: `1px solid ${listFilters.horizons.has(h) ? HORIZON_COLORS[h] : '#c5baa8'}`,
+              background: listFilters.horizons.has(h) ? HORIZON_COLORS[h] : 'transparent',
+              color: listFilters.horizons.has(h) ? '#f5f0e8' : '#5c5344',
               fontSize: 11,
-              fontFamily: 'monospace',
+              fontFamily: 'var(--font-geist-mono), monospace',
               cursor: 'pointer',
             }}
           >
@@ -237,12 +238,12 @@ export function ListView() {
                   gap: 10,
                   padding: '12px 20px',
                   borderLeft: `3px solid ${color}`,
-                  background: 'rgba(255,255,255,0.02)',
+                  background: 'rgba(26,22,5,0.03)',
                   cursor: 'pointer',
                   userSelect: 'none',
                 }}
               >
-                <span style={{ fontSize: 10, color: '#64748b' }}>
+                <span style={{ fontSize: 10, color: '#9c8f7e' }}>
                   {isCollapsed ? '\u25B6' : '\u25BC'}
                 </span>
                 <span
@@ -260,10 +261,10 @@ export function ListView() {
                   style={{
                     marginLeft: 'auto',
                     fontSize: 11,
-                    color: '#64748b',
-                    background: 'rgba(100,116,139,0.15)',
+                    color: '#9c8f7e',
+                    background: 'rgba(156,143,126,0.12)',
                     padding: '2px 8px',
-                    borderRadius: 10,
+                    borderRadius: 2,
                   }}
                 >
                   {sectionTasks.length}
@@ -281,7 +282,7 @@ export function ListView() {
                       alignItems: 'center',
                       gap: 10,
                       padding: '10px 20px',
-                      borderBottom: '1px solid rgba(148,163,184,0.05)',
+                      borderBottom: '1px solid #c5baa8',
                       flexWrap: 'wrap',
                     }}
                   >
@@ -292,7 +293,8 @@ export function ListView() {
                         flex: 1,
                         minWidth: 0,
                         fontSize: 13,
-                        color: '#e2e8f0',
+                        fontFamily: 'var(--font-serif)',
+                        color: '#1a1605',
                         cursor: 'pointer',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
@@ -309,7 +311,7 @@ export function ListView() {
                             width: 6,
                             height: 6,
                             borderRadius: '50%',
-                            background: '#88aaff',
+                            background: '#1e3a5f',
                             flexShrink: 0,
                             display: 'inline-block',
                           }}
@@ -323,10 +325,10 @@ export function ListView() {
                         style={{
                           fontSize: 10,
                           padding: '1px 6px',
-                          borderRadius: 10,
-                          background: 'rgba(245,158,11,0.15)',
-                          border: '1px solid rgba(245,158,11,0.3)',
-                          color: '#f59e0b',
+                          borderRadius: 2,
+                          background: 'rgba(124,58,43,0.08)',
+                          border: '1px solid rgba(124,58,43,0.3)',
+                          color: '#7c3a2b',
                         }}
                       >
                         {task.driftCount}
@@ -340,9 +342,9 @@ export function ListView() {
                         style={{
                           fontSize: 10,
                           padding: '1px 6px',
-                          borderRadius: 10,
-                          background: 'rgba(148,163,184,0.08)',
-                          color: '#64748b',
+                          borderRadius: 2,
+                          background: 'rgba(197,186,168,0.25)',
+                          color: '#5c5344',
                         }}
                       >
                         {tag}
@@ -355,12 +357,12 @@ export function ListView() {
                         onClick={() => handleQuickComplete(task.id)}
                         style={{
                           padding: '4px 10px',
-                          borderRadius: 6,
-                          border: '1px solid rgba(34,197,94,0.2)',
-                          background: 'rgba(34,197,94,0.08)',
-                          color: '#22c55e',
+                          borderRadius: 2,
+                          border: '1px solid rgba(45,80,22,0.3)',
+                          background: 'transparent',
+                          color: '#2d5016',
                           fontSize: 11,
-                          fontFamily: 'monospace',
+                          fontFamily: 'var(--font-geist-mono), monospace',
                           cursor: 'pointer',
                         }}
                       >
@@ -370,12 +372,12 @@ export function ListView() {
                         onClick={() => handleQuickDrop(task.id)}
                         style={{
                           padding: '4px 10px',
-                          borderRadius: 6,
-                          border: '1px solid rgba(148,163,184,0.2)',
-                          background: 'rgba(148,163,184,0.08)',
-                          color: '#64748b',
+                          borderRadius: 2,
+                          border: '1px solid rgba(192,57,43,0.3)',
+                          background: 'transparent',
+                          color: '#c0392b',
                           fontSize: 11,
-                          fontFamily: 'monospace',
+                          fontFamily: 'var(--font-geist-mono), monospace',
                           cursor: 'pointer',
                         }}
                       >
@@ -387,12 +389,12 @@ export function ListView() {
                         }
                         style={{
                           padding: '4px 10px',
-                          borderRadius: 6,
-                          border: '1px solid rgba(59,130,246,0.2)',
-                          background: 'rgba(59,130,246,0.08)',
-                          color: '#3b82f6',
+                          borderRadius: 2,
+                          border: '1px solid rgba(30,58,95,0.3)',
+                          background: 'transparent',
+                          color: '#1e3a5f',
                           fontSize: 11,
-                          fontFamily: 'monospace',
+                          fontFamily: 'var(--font-geist-mono), monospace',
                           cursor: 'pointer',
                         }}
                       >
@@ -408,9 +410,9 @@ export function ListView() {
                           right: 20,
                           top: '100%',
                           zIndex: 10,
-                          background: '#131320',
-                          border: '1px solid rgba(148,163,184,0.15)',
-                          borderRadius: 8,
+                          background: '#fdf8f0',
+                          border: '1px solid #8b7d6b',
+                          borderRadius: 2,
                           overflow: 'hidden',
                           minWidth: 140,
                         }}
@@ -426,10 +428,10 @@ export function ListView() {
                               textAlign: 'left',
                               border: 'none',
                               background:
-                                h === task.horizon ? 'rgba(59,130,246,0.15)' : 'transparent',
-                              color: h === task.horizon ? '#3b82f6' : '#94a3b8',
+                                h === task.horizon ? 'rgba(30,58,95,0.1)' : 'transparent',
+                              color: h === task.horizon ? '#1e3a5f' : '#5c5344',
                               fontSize: 12,
-                              fontFamily: 'monospace',
+                              fontFamily: 'var(--font-geist-mono), monospace',
                               cursor: 'pointer',
                             }}
                           >
@@ -446,7 +448,7 @@ export function ListView() {
       </div>
 
       {filteredTasks.length === 0 && (
-        <div style={{ textAlign: 'center', padding: '60px 20px', color: '#64748b', fontSize: 13 }}>
+        <div style={{ textAlign: 'center', padding: '60px 20px', color: '#9c8f7e', fontSize: 13, fontFamily: 'var(--font-geist-mono), monospace' }}>
           No tasks match the current filters
         </div>
       )}

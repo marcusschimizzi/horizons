@@ -1,34 +1,36 @@
 export const SCENE_CONSTANTS = {
   // Scene atmosphere
-  background: '#0a0a0f',         // Near-black with faint blue hint
-  fogDensity: 0.015,             // FogExp2 density — moderate, proximity=clarity
-  fogColor: '#0a0a0f',           // MUST match background to avoid color banding
+  background: '#f5f0e8',         // Warm cream parchment
+  fogDensity: 0.012,             // FogExp2 density — fade into warm light
+  fogColor: '#f5f0e8',           // MUST match background to avoid color banding
 
   // Lighting
-  ambientIntensity: 0.15,        // Minimal ambient
+  ambientIntensity: 0.5,         // Higher — paper reflects light
 
-  // Stars
-  starCount: 300,                // Sparse (200-400 range)
+  // Stars (disabled — no starfield in a paper world)
+  starCount: 0,
   starRadius: 200,
   starDepth: 100,
   starFactor: 2,
 
-  // Bloom
-  bloomIntensity: 1.8,           // Tuned: stronger glow through fog for depth hierarchy
-  bloomLuminanceThreshold: 0.15, // Lower threshold so more emissive surfaces catch bloom
-  bloomLuminanceSmoothing: 0.015, // Tighter smoothing for cleaner glow edges
-  bloomMipmapBlur: true,
+  // Bloom (disabled — no emissive glow in a paper world)
+  bloomIntensity: 0,
+  bloomLuminanceThreshold: 1.0,
+  bloomLuminanceSmoothing: 0.0,
+  bloomMipmapBlur: false,
 
-  // LOD (horizon-based categorical split)
-  cardHorizons: ['immediate', 'this-week'] as const,
+  // LOD (all horizons render as Html cards — perspective handles distance legibility)
+  cardHorizons: ['immediate', 'this-week', 'this-month', 'this-quarter', 'this-year', 'someday'] as const,
 
-  // Sprite
-  spriteBaseRadius: 0.3,         // Base circle radius
-  spriteEmissiveMultiplier: 1.5, // Color multiplier for bloom trigger
-  spriteOpacity: 0.9,
+  // Sprite (now paper note rectangles: width x height)
+  spriteBaseRadius: 0.3,         // kept for compat; actual size via spriteWidth/spriteHeight
+  spriteWidth: 0.55,             // PlaneGeometry width (landscape note card)
+  spriteHeight: 0.38,            // PlaneGeometry height
+  spriteEmissiveMultiplier: 0,   // No emissive — paper world
+  spriteOpacity: 1.0,
 
   // Html cards
-  htmlDistanceFactor: 10,        // drei Html distanceFactor — start here, tune visually
+  htmlDistanceFactor: 15,        // drei Html: scale = factor/distance. At dist=12.5 (present) → 1.2× CSS size
 
   // LOD crossfade
   crossfadeDurationMs: 200,

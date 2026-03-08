@@ -5,6 +5,7 @@ import { useSelectedTask, useTaskStore, TaskStoreContext } from '@/stores/task-s
 import type { TaskRow } from '@/types/task';
 import type { Horizon } from '@/lib/horizons';
 import { getZDepth } from '@/lib/horizons';
+import { getTaskPosition } from '@/lib/spatial';
 import { horizonToDateRange } from '@/lib/horizon-dates';
 import { cameraStore } from '@/stores/camera-store';
 import { SCENE_CONSTANTS } from '@/lib/scene-constants';
@@ -19,12 +20,12 @@ const HORIZON_LABELS: Record<string, string> = {
 };
 
 const HORIZON_COLORS: Record<string, string> = {
-  'immediate': '#ef4444',
-  'this-week': '#f59e0b',
-  'this-month': '#3b82f6',
-  'this-quarter': '#8b5cf6',
-  'this-year': '#6366f1',
-  'someday': '#64748b',
+  'immediate': '#c0392b',
+  'this-week': '#e76b2e',
+  'this-month': '#1e3a5f',
+  'this-quarter': '#2d5016',
+  'this-year': '#4a2c6b',
+  'someday': '#8b7d6b',
 };
 
 const HORIZON_OPTIONS: { value: Horizon; label: string }[] = [
@@ -64,6 +65,21 @@ export function TaskDetail() {
   const [refinementData, setRefinementData] = useState<{ clarifyingQuestion: string; suggestedTitle: string } | null>(null);
   const [refinementResponse, setRefinementResponse] = useState('');
   const [refinementLoading, setRefinementLoading] = useState(false);
+
+  // Pan camera to task position (X/Y/Z) on selection; reset on deselect
+  useEffect(() => {
+    if (!task) {
+      cameraStore.getState().setPan(0, 0);
+      return;
+    }
+    const pos = getTaskPosition(task.id, task.horizon);
+    const targetZ = Math.max(
+      SCENE_CONSTANTS.farBoundary,
+      Math.min(SCENE_CONSTANTS.nearBoundary, pos.z + 10),
+    );
+    cameraStore.setState({ targetZ, velocity: 0, isAnimating: true });
+    cameraStore.getState().setPan(pos.x, pos.y);
+  }, [task?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Sync local state when task changes (keyed on task.id, not task.title/rawInput)
   useEffect(() => {
@@ -359,15 +375,13 @@ export function TaskDetail() {
     width: 480,
     maxWidth: '100vw',
     height: '100vh',
-    background: 'rgba(10, 10, 15, 0.92)',
-    backdropFilter: 'blur(16px)',
-    WebkitBackdropFilter: 'blur(16px)',
-    borderLeft: '1px solid rgba(148, 163, 184, 0.15)',
+    background: '#fdf8f0',
+    borderLeft: '2px solid #1a1605',
     zIndex: 120,
     transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
     transition: 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
-    color: '#e2e8f0',
-    fontFamily: 'monospace',
+    color: '#1a1605',
+    fontFamily: 'var(--font-geist-mono), monospace',
     display: 'flex',
     flexDirection: 'column',
     boxSizing: 'border-box',
@@ -376,7 +390,7 @@ export function TaskDetail() {
   const backdropStyle: React.CSSProperties = {
     position: 'fixed',
     inset: 0,
-    background: 'rgba(0, 0, 0, 0.3)',
+    background: 'rgba(26, 22, 5, 0.15)',
     zIndex: 119,
     pointerEvents: isOpen ? 'auto' : 'none',
     opacity: isOpen ? 1 : 0,
@@ -388,14 +402,14 @@ export function TaskDetail() {
     alignItems: 'center',
     gap: 12,
     padding: '20px 20px 12px 20px',
-    borderBottom: '1px solid rgba(148, 163, 184, 0.1)',
+    borderBottom: '1px solid #c5baa8',
   };
 
   const closeBtnStyle: React.CSSProperties = {
     background: 'none',
-    border: '1px solid rgba(148, 163, 184, 0.2)',
-    borderRadius: 6,
-    color: '#94a3b8',
+    border: '1px solid #c5baa8',
+    borderRadius: 2,
+    color: '#5c5344',
     fontSize: 16,
     width: 32,
     height: 32,
@@ -410,10 +424,10 @@ export function TaskDetail() {
     flex: 1,
     background: 'transparent',
     border: 'none',
-    color: '#e2e8f0',
+    color: '#1a1605',
     fontSize: 18,
     fontWeight: 600,
-    fontFamily: 'monospace',
+    fontFamily: 'var(--font-serif)',
     outline: 'none',
     padding: 0,
   };
@@ -443,22 +457,22 @@ export function TaskDetail() {
     borderRadius: 12,
     fontSize: 12,
     fontWeight: 600,
-    background: 'rgba(245, 158, 11, 0.12)',
-    color: '#f59e0b',
-    border: '1px solid rgba(245, 158, 11, 0.3)',
+    background: 'rgba(124, 58, 43, 0.08)',
+    color: '#7c3a2b',
+    border: '1px solid rgba(124, 58, 43, 0.3)',
   };
 
   const textareaStyle: React.CSSProperties = {
     flex: 1,
     margin: '0 20px',
     padding: 12,
-    background: 'rgba(30, 30, 40, 0.5)',
-    border: '1px solid rgba(148, 163, 184, 0.1)',
-    borderRadius: 8,
-    color: '#cbd5e1',
+    background: '#f5f0e8',
+    border: '1px solid #c5baa8',
+    borderRadius: 2,
+    color: '#1a1605',
     fontSize: 13,
     lineHeight: 1.6,
-    fontFamily: 'monospace',
+    fontFamily: 'var(--font-serif)',
     resize: 'none',
     outline: 'none',
     minHeight: 120,
@@ -470,8 +484,8 @@ export function TaskDetail() {
 
   const rescheduleLabelStyle: React.CSSProperties = {
     fontSize: 11,
-    color: '#64748b',
-    fontFamily: 'monospace',
+    color: '#9c8f7e',
+    fontFamily: 'var(--font-geist-mono), monospace',
     marginBottom: 8,
     textTransform: 'uppercase',
     letterSpacing: '0.05em',
@@ -486,7 +500,7 @@ export function TaskDetail() {
   const actionBarStyle: React.CSSProperties = {
     marginTop: 'auto',
     padding: '16px 20px',
-    borderTop: '1px solid rgba(148, 163, 184, 0.1)',
+    borderTop: '1px solid #c5baa8',
     display: 'flex',
     gap: 10,
   };
@@ -498,23 +512,23 @@ export function TaskDetail() {
     border: 'none',
     fontSize: 13,
     fontWeight: 600,
-    fontFamily: 'monospace',
+    fontFamily: 'var(--font-geist-mono), monospace',
     cursor: 'pointer',
     transition: 'opacity 0.15s ease',
   };
 
   const completeBtnStyle: React.CSSProperties = {
     ...btnBase,
-    background: 'rgba(34, 197, 94, 0.15)',
-    color: '#22c55e',
-    border: '1px solid rgba(34, 197, 94, 0.3)',
+    background: 'rgba(45, 80, 22, 0.08)',
+    color: '#2d5016',
+    border: '1px solid rgba(45, 80, 22, 0.3)',
   };
 
   const dropBtnStyle: React.CSSProperties = {
     ...btnBase,
-    background: 'rgba(239, 68, 68, 0.1)',
-    color: '#94a3b8',
-    border: '1px solid rgba(148, 163, 184, 0.15)',
+    background: 'rgba(192, 57, 43, 0.08)',
+    color: '#c0392b',
+    border: '1px solid rgba(192, 57, 43, 0.3)',
   };
 
   const overlayStyle: React.CSSProperties = {
@@ -524,7 +538,7 @@ export function TaskDetail() {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    background: 'rgba(10, 10, 15, 0.85)',
+    background: 'rgba(253, 248, 240, 0.95)',
     zIndex: 1,
     gap: 8,
   };
@@ -539,21 +553,19 @@ export function TaskDetail() {
     alignItems: 'center',
     gap: 12,
     padding: '10px 18px',
-    background: 'rgba(20, 20, 30, 0.9)',
-    backdropFilter: 'blur(12px)',
-    WebkitBackdropFilter: 'blur(12px)',
-    border: '1px solid rgba(148, 163, 184, 0.2)',
-    borderRadius: 24,
-    fontFamily: 'monospace',
+    background: '#fdf8f0',
+    border: '1px solid #8b7d6b',
+    borderRadius: 4,
+    fontFamily: 'var(--font-geist-mono), monospace',
     fontSize: 13,
-    color: '#e2e8f0',
+    color: '#1a1605',
   };
 
   const undoBtnStyle: React.CSSProperties = {
     background: 'none',
-    border: '1px solid rgba(34, 197, 94, 0.4)',
-    borderRadius: 6,
-    color: '#22c55e',
+    border: '1px solid rgba(45, 80, 22, 0.4)',
+    borderRadius: 2,
+    color: '#2d5016',
     fontSize: 12,
     fontWeight: 600,
     fontFamily: 'monospace',
@@ -564,11 +576,11 @@ export function TaskDetail() {
   const driftPromptStyle: React.CSSProperties = {
     margin: '0 20px 12px 20px',
     padding: 14,
-    background: 'rgba(245, 158, 11, 0.08)',
-    border: '1px solid rgba(245, 158, 11, 0.2)',
-    borderRadius: 10,
-    fontFamily: 'monospace',
-    color: '#f59e0b',
+    background: 'rgba(124, 58, 43, 0.06)',
+    border: '1px solid rgba(124, 58, 43, 0.2)',
+    borderRadius: 2,
+    fontFamily: 'var(--font-geist-mono), monospace',
+    color: '#7c3a2b',
   };
 
   const driftActionBtnStyle = (color: string): React.CSSProperties => ({
@@ -586,30 +598,30 @@ export function TaskDetail() {
   const refinementSectionStyle: React.CSSProperties = {
     margin: '0 20px 12px 20px',
     padding: 14,
-    background: 'rgba(136, 170, 255, 0.08)',
-    border: '1px solid rgba(136, 170, 255, 0.2)',
-    borderRadius: 10,
-    fontFamily: 'monospace',
+    background: 'rgba(30, 58, 95, 0.06)',
+    border: '1px solid rgba(30, 58, 95, 0.2)',
+    borderRadius: 2,
+    fontFamily: 'var(--font-geist-mono), monospace',
   };
 
   const refinementInputStyle: React.CSSProperties = {
     flex: 1,
     padding: '8px 12px',
-    background: 'rgba(30, 30, 40, 0.5)',
-    border: '1px solid rgba(136, 170, 255, 0.2)',
-    borderRadius: 8,
-    color: '#e2e8f0',
+    background: '#f5f0e8',
+    border: '1px solid rgba(30, 58, 95, 0.25)',
+    borderRadius: 2,
+    color: '#1a1605',
     fontSize: 13,
-    fontFamily: 'monospace',
+    fontFamily: 'var(--font-geist-mono), monospace',
     outline: 'none',
   };
 
   const refinementSubmitStyle: React.CSSProperties = {
     padding: '8px 16px',
     borderRadius: 8,
-    border: '1px solid rgba(136, 170, 255, 0.3)',
-    background: 'rgba(136, 170, 255, 0.15)',
-    color: '#88aaff',
+    border: '1px solid rgba(30, 58, 95, 0.3)',
+    background: 'rgba(30, 58, 95, 0.1)',
+    color: '#1e3a5f',
     fontSize: 12,
     fontWeight: 600,
     fontFamily: 'monospace',
@@ -617,7 +629,7 @@ export function TaskDetail() {
     flexShrink: 0,
   };
 
-  const horizonColor = task ? (HORIZON_COLORS[task.horizon] || '#64748b') : '#64748b';
+  const horizonColor = task ? (HORIZON_COLORS[task.horizon] || '#8b7d6b') : '#8b7d6b';
   const horizonLabel = task ? (HORIZON_LABELS[task.horizon] || task.horizon) : '';
 
   return (
@@ -637,7 +649,7 @@ export function TaskDetail() {
             {/* Success overlay for dropped */}
             {actionResult === 'dropped' && (
               <div style={overlayStyle}>
-                <span style={{ fontSize: 14, color: '#64748b' }}>Task dropped</span>
+                <span style={{ fontSize: 14, color: '#9c8f7e' }}>Task dropped</span>
               </div>
             )}
 
@@ -666,15 +678,15 @@ export function TaskDetail() {
             {task.needsRefinement && (
               <div style={refinementSectionStyle}>
                 {refinementLoading ? (
-                  <div style={{ fontSize: 12, color: '#64748b', fontStyle: 'italic' }}>
+                  <div style={{ fontSize: 12, color: '#9c8f7e', fontStyle: 'italic' }}>
                     Generating refinement prompt...
                   </div>
                 ) : refinementData ? (
                   <>
-                    <div style={{ fontSize: 12, color: '#88aaff', marginBottom: 8, lineHeight: 1.5 }}>
+                    <div style={{ fontSize: 12, color: '#1e3a5f', marginBottom: 8, lineHeight: 1.5 }}>
                       {refinementData.clarifyingQuestion}
                     </div>
-                    <div style={{ fontSize: 11, color: '#64748b', marginBottom: 10 }}>
+                    <div style={{ fontSize: 11, color: '#9c8f7e', marginBottom: 10 }}>
                       Suggested: &ldquo;{refinementData.suggestedTitle}&rdquo;
                     </div>
                     <div style={{ display: 'flex', gap: 8 }}>
@@ -710,7 +722,7 @@ export function TaskDetail() {
               <div style={reschedulePillsStyle}>
                 {HORIZON_OPTIONS.map((opt) => {
                   const isCurrent = task.horizon === opt.value;
-                  const color = HORIZON_COLORS[opt.value] || '#64748b';
+                  const color = HORIZON_COLORS[opt.value] || '#8b7d6b';
                   const pillStyle: React.CSSProperties = {
                     padding: '5px 12px',
                     borderRadius: 16,
@@ -718,8 +730,8 @@ export function TaskDetail() {
                     fontWeight: 600,
                     fontFamily: 'monospace',
                     cursor: isCurrent ? 'default' : 'pointer',
-                    border: `1px solid ${isCurrent ? color : 'rgba(148, 163, 184, 0.2)'}`,
-                    background: isCurrent ? `${color}22` : 'rgba(30, 30, 40, 0.5)',
+                    border: `1px solid ${isCurrent ? color : '#c5baa8'}`,
+                    background: isCurrent ? `${color}22` : '#fdf8f0',
                     color: isCurrent ? color : '#94a3b8',
                     transition: 'all 0.15s ease',
                   };
@@ -744,13 +756,13 @@ export function TaskDetail() {
                   This has moved {task.driftCount} times. What&apos;s in the way?
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <button style={driftActionBtnStyle('#3b82f6')} onClick={() => handleReschedule(task.horizon)}>
+                  <button style={driftActionBtnStyle('#1e3a5f')} onClick={() => handleReschedule(task.horizon)}>
                     Recommit
                   </button>
-                  <button style={driftActionBtnStyle('#64748b')} onClick={() => handleReschedule('someday')}>
+                  <button style={driftActionBtnStyle('#9c8f7e')} onClick={() => handleReschedule('someday')}>
                     Snooze
                   </button>
-                  <button style={driftActionBtnStyle('#ef4444')} onClick={handleDrop}>
+                  <button style={driftActionBtnStyle('#c0392b')} onClick={handleDrop}>
                     Drop
                   </button>
                 </div>

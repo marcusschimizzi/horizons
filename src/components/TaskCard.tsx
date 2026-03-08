@@ -4,7 +4,19 @@ import { useState, useEffect, useContext } from 'react';
 import { Html } from '@react-three/drei';
 import type { Task } from '@/types/task';
 import { SCENE_CONSTANTS } from '@/lib/scene-constants';
-import { TaskStoreContext, useIsCompleting, useIsDropping } from '@/stores/task-store';
+import { TaskStoreContext, useIsCompleting, useIsDropping, useTaskStore } from '@/stores/task-store';
+import type { Horizon } from '@/lib/horizons';
+import { lerpHex } from '@/lib/color';
+
+// Horizon depth: 0 = immediate (full ink), 1 = someday (pencil)
+const HORIZON_DEPTH: Record<Horizon, number> = {
+  'immediate':    0.0,
+  'this-week':    0.2,
+  'this-month':   0.4,
+  'this-quarter': 0.6,
+  'this-year':    0.8,
+  'someday':      1.0,
+};
 
 interface TaskCardProps {
   task: Task;
@@ -16,6 +28,7 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
   const store = useContext(TaskStoreContext);
   const isCompleting = useIsCompleting(task.id);
   const isDropping = useIsDropping(task.id);
+  const isSelected = useTaskStore((s) => s.selectedTaskId === task.id);
   const hasDeadline = task.hardDeadline !== null;
   const isDrifted = task.driftCount > 0;
 
@@ -53,18 +66,27 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
       ? 'refinementPulse 3s ease-in-out infinite'
       : undefined;
 
+  const depth = HORIZON_DEPTH[task.horizon];
+  const inkColor = lerpHex('#1a1605', '#b8ac9e', depth);
+  const inkBorder = lerpHex('#8b7d6b', '#d4ccc4', depth);
+  const shadowAlpha = (0.12 - depth * 0.10).toFixed(2);
+
+  const selectionRing = isSelected
+    ? `, 0 0 0 2px rgba(92, 83, 68, 0.6)`
+    : '';
+
   const cardStyle: React.CSSProperties = {
     position: 'relative',
-    width: 200,
-    padding: '10px 14px',
-    background: 'rgba(18, 18, 26, 0.75)',
-    backdropFilter: 'blur(8px)',
-    WebkitBackdropFilter: 'blur(8px)',
-    border: '1px solid rgba(148, 163, 184, 0.15)',
-    borderRadius: 8,
-    color: '#e2e8f0',
-    fontSize: 13,
-    lineHeight: 1.3,
+    width: 260,
+    padding: '12px 16px',
+    background: '#fdf8f0',
+    border: isSelected ? '2px solid #5c5344' : `1px solid ${inkBorder}`,
+    borderRadius: 2,
+    boxShadow: `2px 3px 8px rgba(26, 22, 5, ${shadowAlpha})${selectionRing}`,
+    color: inkColor,
+    fontFamily: 'var(--font-serif)',
+    fontSize: 14,
+    lineHeight: 1.4,
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -76,14 +98,8 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
     ...(isNew
       ? { transition: 'opacity 0.5s ease-out, transform 0.5s ease-out' }
       : {}),
-    // Pulse animation for hardDeadline (amber) or needsRefinement (blue)
+    // Pulse animation for hardDeadline or needsRefinement
     ...(pulseAnimation ? { animation: pulseAnimation } : {}),
-    // Drift desaturation
-    ...(isDrifted
-      ? {
-          filter: `saturate(${Math.max(0.3, 1 - task.driftCount * 0.15)})`,
-        }
-      : {}),
     // Completion dissolution: fade + shrink
     ...(isCompleting
       ? {
@@ -106,17 +122,18 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
       <Html
         center
         distanceFactor={SCENE_CONSTANTS.htmlDistanceFactor}
+        zIndexRange={[100, 0]}
         style={{ pointerEvents: 'none' }}
       >
         <>
           <style>{`
             @keyframes refinementPulse {
-              0%, 100% { box-shadow: 0 0 4px rgba(136, 170, 255, 0.2), inset 0 0 2px rgba(136, 170, 255, 0.1); }
-              50% { box-shadow: 0 0 12px rgba(136, 170, 255, 0.5), inset 0 0 4px rgba(136, 170, 255, 0.2); }
+              0%, 100% { box-shadow: 2px 3px 8px rgba(26,22,5,${shadowAlpha}), 0 0 0 2px rgba(30,58,95,0.15); }
+              50% { box-shadow: 2px 3px 8px rgba(26,22,5,${shadowAlpha}), 0 0 0 3px rgba(30,58,95,0.35); }
             }
             @keyframes deadlinePulse {
-              0%, 100% { box-shadow: 0 0 6px rgba(245, 158, 11, 0.3); }
-              50% { box-shadow: 0 0 14px rgba(245, 158, 11, 0.6), inset 0 0 4px rgba(245, 158, 11, 0.15); }
+              0%, 100% { box-shadow: 2px 3px 8px rgba(26,22,5,${shadowAlpha}), 0 0 0 2px rgba(124,58,43,0.15); }
+              50% { box-shadow: 2px 3px 8px rgba(26,22,5,${shadowAlpha}), 0 0 0 3px rgba(124,58,43,0.35); }
             }
           `}</style>
           <div style={cardStyle} onClick={() => store?.getState().selectTask(task.id)}>
@@ -126,8 +143,8 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
                 position: 'absolute',
                 top: -6,
                 right: -6,
-                background: 'rgba(245, 158, 11, 0.9)',
-                color: '#fff',
+                background: '#fdf8f0',
+                color: '#7c3a2b',
                 fontSize: 10,
                 fontWeight: 700,
                 borderRadius: '50%',
@@ -136,7 +153,8 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                border: '1.5px solid rgba(10, 10, 15, 0.8)',
+                border: '1.5px solid #7c3a2b',
+                fontFamily: 'var(--font-geist-mono), monospace',
               }}>
                 {task.driftCount}
               </span>

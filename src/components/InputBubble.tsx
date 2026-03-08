@@ -213,10 +213,10 @@ export function InputBubble() {
   };
 
   const borderColor = isFocused
-    ? 'rgba(148, 163, 184, 0.4)'
+    ? '#8b7d6b'
     : isHovered
-      ? 'rgba(148, 163, 184, 0.3)'
-      : 'rgba(148, 163, 184, 0.2)';
+      ? '#a09080'
+      : '#c5baa8';
 
   const inputWrapperStyle: React.CSSProperties = {
     position: 'relative',
@@ -226,15 +226,13 @@ export function InputBubble() {
   const inputStyle: React.CSSProperties = {
     width: '100%',
     boxSizing: 'border-box',
-    background: 'rgba(18, 18, 26, 0.85)',
-    backdropFilter: 'blur(12px)',
-    WebkitBackdropFilter: 'blur(12px)',
+    background: '#fdf8f0',
     border: `1px solid ${borderColor}`,
-    borderRadius: 24,
+    borderRadius: 4,
     padding: '12px 48px 12px 20px',
-    color: '#e2e8f0',
+    color: '#1a1605',
     fontSize: 14,
-    fontFamily: 'monospace',
+    fontFamily: 'var(--font-geist-mono), monospace',
     outline: 'none',
     transition: 'border-color 0.2s ease',
     ...(isLoading
@@ -249,14 +247,14 @@ export function InputBubble() {
     transform: 'translateY(-50%)',
     width: 28,
     height: 28,
-    borderRadius: '50%',
-    background: 'rgba(148, 163, 184, 0.1)',
+    borderRadius: 2,
+    background: submitHovered ? '#8b7d6b' : 'transparent',
     border: 'none',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     cursor: 'pointer',
-    color: submitHovered ? '#e2e8f0' : '#94a3b8',
+    color: submitHovered ? '#fdf8f0' : '#8b7d6b',
     opacity: showSubmitButton ? 1 : 0,
     pointerEvents: showSubmitButton ? 'auto' : 'none',
     transition: 'opacity 0.2s ease, color 0.2s ease',
@@ -278,9 +276,9 @@ export function InputBubble() {
   };
 
   const errorStyle: React.CSSProperties = {
-    color: '#f87171',
+    color: '#c0392b',
     fontSize: 12,
-    fontFamily: 'monospace',
+    fontFamily: 'var(--font-geist-mono), monospace',
     opacity: error ? 1 : 0,
     transition: 'opacity 0.3s ease',
     marginTop: 4,
@@ -289,15 +287,13 @@ export function InputBubble() {
   };
 
   const toastStyle: React.CSSProperties = {
-    background: 'rgba(18, 18, 26, 0.9)',
-    backdropFilter: 'blur(12px)',
-    WebkitBackdropFilter: 'blur(12px)',
-    border: '1px solid rgba(148, 163, 184, 0.15)',
-    borderRadius: 16,
+    background: '#fdf8f0',
+    border: '1px solid #c5baa8',
+    borderRadius: 4,
     padding: '8px 16px',
     fontSize: 12,
-    fontFamily: 'monospace',
-    color: '#94a3b8',
+    fontFamily: 'var(--font-geist-mono), monospace',
+    color: '#5c5344',
     opacity: toastFading ? 0 : 1,
     transition: 'opacity 0.5s ease',
     pointerEvents: 'none',
@@ -312,8 +308,8 @@ export function InputBubble() {
       {/* Injected keyframe animation for loading pulse */}
       <style>{`
         @keyframes inputPulse {
-          0%, 100% { border-color: rgba(148, 163, 184, 0.2); }
-          50% { border-color: rgba(148, 163, 184, 0.5); }
+          0%, 100% { border-color: #c5baa8; }
+          50% { border-color: #8b7d6b; }
         }
         @keyframes loadingDot {
           0%, 80%, 100% { opacity: 0.2; }
@@ -383,7 +379,7 @@ export function InputBubble() {
                   width: 4,
                   height: 4,
                   borderRadius: '50%',
-                  background: '#94a3b8',
+                  background: '#8b7d6b',
                   animation: `loadingDot 1.2s ease-in-out ${i * 0.2}s infinite`,
                 }}
               />
