@@ -19,8 +19,8 @@ export const SCENE_CONSTANTS = {
   bloomLuminanceSmoothing: 0.0,
   bloomMipmapBlur: false,
 
-  // LOD (horizon-based categorical split)
-  cardHorizons: ['immediate', 'this-week'] as const,
+  // LOD (all horizons render as Html cards — perspective handles distance legibility)
+  cardHorizons: ['immediate', 'this-week', 'this-month', 'this-quarter', 'this-year', 'someday'] as const,
 
   // Sprite (now paper note rectangles: width x height)
   spriteBaseRadius: 0.3,         // kept for compat; actual size via spriteWidth/spriteHeight
@@ -30,7 +30,7 @@ export const SCENE_CONSTANTS = {
   spriteOpacity: 1.0,
 
   // Html cards
-  htmlDistanceFactor: 10,        // drei Html distanceFactor — start here, tune visually
+  htmlDistanceFactor: 15,        // drei Html: scale = factor/distance. At dist=12.5 (present) → 1.2× CSS size
 
   // LOD crossfade
   crossfadeDurationMs: 200,

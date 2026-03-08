@@ -17,9 +17,7 @@ import { TaskDetail } from './TaskDetail';
 import { DriftNotification } from './DriftNotification';
 import { ListView } from './ListView';
 import { TextureToggle } from './TextureToggle';
-
-// O(1) lookup for card horizons (same set as TaskNode, used for breakdown count)
-const cardHorizonsSet = new Set<string>(SCENE_CONSTANTS.cardHorizons);
+import { HorizonIndicator } from './HorizonIndicator';
 
 // ---------------------------------------------------------------------------
 // SceneInvalidator — subscribes to Zustand store and calls invalidate()
@@ -163,8 +161,7 @@ export default function HorizonScene({ driftSummary }: HorizonSceneProps) {
   const toggleListView = useTaskStore((s) => s.toggleListView);
 
   const taskBreakdown = useMemo(() => {
-    const cards = tasks.filter((t) => cardHorizonsSet.has(t.horizon)).length;
-    return { total: tasks.length, cards, sprites: tasks.length - cards };
+    return { total: tasks.length, cards: tasks.length, sprites: 0 };
   }, [tasks]);
 
   // L key toggles between 3D scene and list view
@@ -211,7 +208,7 @@ export default function HorizonScene({ driftSummary }: HorizonSceneProps) {
       <div style={{ display: showListView ? 'none' : 'contents' }}>
         <Canvas
           frameloop="demand"
-          camera={{ position: [0, 0, SCENE_CONSTANTS.cameraRestZ], fov: 60 }}
+          camera={{ position: [0, 0, SCENE_CONSTANTS.cameraRestZ], fov: 45 }}
           style={{
             width: '100%',
             height: '100%',
@@ -229,6 +226,7 @@ export default function HorizonScene({ driftSummary }: HorizonSceneProps) {
         <DriftNotification count={driftSummary.count} />
       )}
       {!showListView && <SnapToPresent />}
+      {!showListView && <HorizonIndicator />}
       <TextureToggle />
       <InputBubble />
       <TaskDetail />

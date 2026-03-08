@@ -35,12 +35,12 @@ function mulberry32(seed: number): () => number {
 
 /** X/Y spread multipliers per horizon band (wider for distant bands) */
 export const SPREAD_CONFIG: Record<Horizon, { xSpread: number; ySpread: number }> = {
-  'immediate':    { xSpread: 4,  ySpread: 2 },
-  'this-week':    { xSpread: 6,  ySpread: 3 },
-  'this-month':   { xSpread: 10, ySpread: 4 },
-  'this-quarter': { xSpread: 14, ySpread: 5 },
-  'this-year':    { xSpread: 18, ySpread: 6 },
-  'someday':      { xSpread: 22, ySpread: 7 },
+  'immediate':    { xSpread: 7,  ySpread: 3.5 },
+  'this-week':    { xSpread: 9,  ySpread: 4 },
+  'this-month':   { xSpread: 12, ySpread: 5 },
+  'this-quarter': { xSpread: 16, ySpread: 6 },
+  'this-year':    { xSpread: 20, ySpread: 7 },
+  'someday':      { xSpread: 24, ySpread: 8 },
 };
 
 export interface TaskPosition {
@@ -74,7 +74,7 @@ export function getTaskPosition(taskId: string, horizon: Horizon): TaskPosition 
  */
 export function applyOverlapAvoidance(
   positions: { id: string; pos: TaskPosition; horizon: Horizon }[],
-  minDistance: number = 2.0,
+  minDistance: number = 3.0,
   iterations: number = 3,
 ): Map<string, TaskPosition> {
   const result = new Map<string, TaskPosition>();

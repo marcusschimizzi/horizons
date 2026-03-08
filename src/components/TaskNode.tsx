@@ -6,13 +6,8 @@ import { damp3 } from 'maath/easing';
 import * as THREE from 'three';
 
 import type { Task } from '@/types/task';
-import { SCENE_CONSTANTS } from '@/lib/scene-constants';
 import { useIsNewTask } from '@/stores/task-store';
 import { TaskCard } from './TaskCard';
-import { TaskSprite } from './TaskSprite';
-
-// O(1) lookup set from the scene constants
-const cardHorizonsSet = new Set<string>(SCENE_CONSTANTS.cardHorizons);
 
 // Smoothing time for position drift (seconds) — lower = snappier
 const DRIFT_SMOOTH_TIME = 0.4;
@@ -25,9 +20,6 @@ export interface TaskNodeProps {
 }
 
 export function TaskNode({ task, position }: TaskNodeProps) {
-  // Categorical LOD split: immediate + this-week render as cards, rest as sprites.
-  // Kept as explicit variable so Phase 4 can extend with camera distance + hysteresis.
-  const isCard = cardHorizonsSet.has(task.horizon);
   const isNew = useIsNewTask(task.id);
   const groupRef = useRef<THREE.Group>(null);
   const invalidate = useThree((state) => state.invalidate);
@@ -56,17 +48,9 @@ export function TaskNode({ task, position }: TaskNodeProps) {
     }
   });
 
-  if (isCard) {
-    return (
-      <group ref={groupRef} position={position}>
-        <TaskCard task={task} position={[0, 0, 0]} isNew={isNew} />
-      </group>
-    );
-  }
-
   return (
     <group ref={groupRef} position={position}>
-      <TaskSprite task={task} position={[0, 0, 0]} isNew={isNew} />
+      <TaskCard task={task} position={[0, 0, 0]} isNew={isNew} />
     </group>
   );
 }
