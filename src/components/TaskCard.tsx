@@ -3,8 +3,9 @@
 import { useState, useEffect, useContext } from 'react';
 import { Html } from '@react-three/drei';
 import type { Task } from '@/types/task';
-import { SCENE_CONSTANTS } from '@/lib/scene-constants';
+import { useExperienceConfig } from '@/stores/theme-store';
 import { TaskStoreContext, useIsCompleting, useIsDropping } from '@/stores/task-store';
+import { getInkColor, getInkShadowAlpha } from '@/lib/ink-weight';
 
 interface TaskCardProps {
   task: Task;
@@ -18,6 +19,8 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
   const isDropping = useIsDropping(task.id);
   const hasDeadline = task.hardDeadline !== null;
   const isDrifted = task.driftCount > 0;
+  const { css, scene } = useExperienceConfig();
+  const { htmlDistanceFactor, inkWeight } = scene;
 
   // Entrance state: existing tasks start entered, new tasks start un-entered
   const [entered, setEntered] = useState(!isNew);
@@ -25,12 +28,10 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
   useEffect(() => {
     if (!isNew) return;
 
-    // Trigger enter on next animation frame for CSS transition
     const raf = requestAnimationFrame(() => {
       setEntered(true);
     });
 
-    // Clear newTask flag after transition completes
     const timer = setTimeout(() => {
       store?.getState().clearNewTask(task.id);
     }, 500);
@@ -41,12 +42,24 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
     };
   }, [isNew, task.id, store]);
 
-  // Compute drift-based opacity (only when entered)
   const driftOpacity = isDrifted
     ? Math.max(0.6, 1 - task.driftCount * 0.1)
     : 1;
 
-  // Determine animation: hardDeadline takes priority over needsRefinement
+  // Ink-weight colors (whitevoid only — encodes temporal depth into card styling)
+  const inkTextColor = inkWeight
+    ? getInkColor(task.horizon, inkWeight.darkInk, inkWeight.pencilGray)
+    : css.textPrimary;
+  const inkBorderColor = inkWeight
+    ? getInkColor(task.horizon, inkWeight.borderDark, inkWeight.borderLight)
+    : `${css.accentGlow}1f`;
+  const inkShadowAlpha = inkWeight ? getInkShadowAlpha(task.horizon) : 0.06;
+  const shadowColorSource = inkWeight ? inkWeight.borderDark : css.accentGlow;
+  const shadowAlphaHex = Math.round(inkShadowAlpha * 255).toString(16).padStart(2, '0');
+
+  // Surface opacity as hex alpha suffix
+  const surfaceAlphaHex = Math.round(css.surfaceOpacity * 255).toString(16).padStart(2, '0');
+
   const pulseAnimation = hasDeadline
     ? 'deadlinePulse 4s ease-in-out infinite'
     : task.needsRefinement
@@ -57,12 +70,16 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
     position: 'relative',
     width: 200,
     padding: '10px 14px',
-    background: 'rgba(18, 18, 26, 0.75)',
-    backdropFilter: 'blur(8px)',
-    WebkitBackdropFilter: 'blur(8px)',
-    border: '1px solid rgba(148, 163, 184, 0.15)',
-    borderRadius: 8,
-    color: '#e2e8f0',
+    background: `${css.bgSecondary}${surfaceAlphaHex}`,
+    ...(css.backdropBlur > 0 ? {
+      backdropFilter: `blur(${css.backdropBlur}px)`,
+      WebkitBackdropFilter: `blur(${css.backdropBlur}px)`,
+    } : {}),
+    border: `1px solid ${inkBorderColor}`,
+    borderRadius: css.borderRadius,
+    boxShadow: `inset 0 0 12px ${shadowColorSource}${shadowAlphaHex}`,
+    color: inkTextColor,
+    fontFamily: 'var(--font-body), sans-serif',
     fontSize: 13,
     lineHeight: 1.3,
     whiteSpace: 'nowrap',
@@ -70,21 +87,17 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
     textOverflow: 'ellipsis',
     pointerEvents: 'auto',
     cursor: 'pointer',
-    // Entrance animation
     opacity: entered ? driftOpacity : 0,
     transform: entered ? 'scale(1)' : 'scale(0.85)',
     ...(isNew
       ? { transition: 'opacity 0.5s ease-out, transform 0.5s ease-out' }
       : {}),
-    // Pulse animation for hardDeadline (amber) or needsRefinement (blue)
     ...(pulseAnimation ? { animation: pulseAnimation } : {}),
-    // Drift desaturation
     ...(isDrifted
       ? {
           filter: `saturate(${Math.max(0.3, 1 - task.driftCount * 0.15)})`,
         }
       : {}),
-    // Completion dissolution: fade + shrink
     ...(isCompleting
       ? {
           opacity: 0,
@@ -92,7 +105,6 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
           transition: 'opacity 0.5s ease-out, transform 0.5s ease-out',
         }
       : {}),
-    // Drop dissolution: abrupt shrink, no fade
     ...(isDropping
       ? {
           transform: 'scale(0)',
@@ -105,18 +117,18 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
     <group position={position}>
       <Html
         center
-        distanceFactor={SCENE_CONSTANTS.htmlDistanceFactor}
+        distanceFactor={htmlDistanceFactor}
         style={{ pointerEvents: 'none' }}
       >
         <>
           <style>{`
             @keyframes refinementPulse {
-              0%, 100% { box-shadow: 0 0 4px rgba(136, 170, 255, 0.2), inset 0 0 2px rgba(136, 170, 255, 0.1); }
-              50% { box-shadow: 0 0 12px rgba(136, 170, 255, 0.5), inset 0 0 4px rgba(136, 170, 255, 0.2); }
+              0%, 100% { box-shadow: 0 0 4px ${css.accentRefinement}33, inset 0 0 2px ${css.accentRefinement}1a; }
+              50% { box-shadow: 0 0 12px ${css.accentRefinement}80, inset 0 0 4px ${css.accentRefinement}33; }
             }
             @keyframes deadlinePulse {
-              0%, 100% { box-shadow: 0 0 6px rgba(245, 158, 11, 0.3); }
-              50% { box-shadow: 0 0 14px rgba(245, 158, 11, 0.6), inset 0 0 4px rgba(245, 158, 11, 0.15); }
+              0%, 100% { box-shadow: 0 0 6px ${css.accentGlow}4d; }
+              50% { box-shadow: 0 0 14px ${css.accentGlow}99, inset 0 0 4px ${css.accentGlow}26; }
             }
           `}</style>
           <div style={cardStyle} onClick={() => store?.getState().selectTask(task.id)}>
@@ -126,17 +138,18 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
                 position: 'absolute',
                 top: -6,
                 right: -6,
-                background: 'rgba(245, 158, 11, 0.9)',
-                color: '#fff',
+                background: `${css.accentDrift}e6`,
+                color: css.textPrimary,
                 fontSize: 10,
                 fontWeight: 700,
+                fontFamily: 'var(--font-body), sans-serif',
                 borderRadius: '50%',
                 width: 18,
                 height: 18,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                border: '1.5px solid rgba(10, 10, 15, 0.8)',
+                border: `1.5px solid ${css.bgPrimary}cc`,
               }}>
                 {task.driftCount}
               </span>

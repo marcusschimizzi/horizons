@@ -1,15 +1,26 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fraunces, DM_Sans, Lora } from "next/font/google";
+import { GeistMono } from "geist/font/mono";
+import { ThemeSyncer } from "@/components/ThemeSyncer";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
+  display: "swap",
+  axes: ["SOFT", "WONK", "opsz"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
   subsets: ["latin"],
+  display: "swap",
+});
+
+const lora = Lora({
+  variable: "--font-lora",
+  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -23,10 +34,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" data-theme="bioluminescent">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} bg-bg-primary text-text-primary min-h-screen antialiased`}
+        className={`${fraunces.variable} ${dmSans.variable} ${lora.variable} ${GeistMono.variable} bg-bg-primary text-text-primary min-h-screen antialiased`}
+        style={{ fontFamily: "var(--font-body), sans-serif" }}
       >
+        <ThemeSyncer />
         {children}
       </body>
     </html>

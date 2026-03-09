@@ -3,11 +3,12 @@
 import { useRef, useMemo } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import { getExperienceConfig } from '@/stores/theme-store';
 
 const PARTICLE_COUNT = 24;
 const DURATION = 0.8;
-const MIN_SPEED = 1.5;
-const MAX_SPEED = 3.5;
+const MIN_SPEED = 1.2;
+const MAX_SPEED = 2.8;
 
 interface CompletionBurstProps {
   position: [number, number, number];
@@ -34,16 +35,18 @@ export function CompletionBurst({ position, onComplete }: CompletionBurstProps) 
     return vels;
   }, []);
 
-  // Create geometry with positions at origin and white-to-gold vertex colors
+  // Create geometry with positions at origin and themed vertex colors
   const geometry = useMemo(() => {
     const geo = new THREE.BufferGeometry();
-    const positions = new Float32Array(PARTICLE_COUNT * 3); // all zeros (origin)
+    const positions = new Float32Array(PARTICLE_COUNT * 3);
     const colors = new Float32Array(PARTICLE_COUNT * 3);
 
+    const { burstColors } = getExperienceConfig().scene;
     for (let i = 0; i < PARTICLE_COUNT; i++) {
-      colors[i * 3] = 1.0;                          // R = 1
-      colors[i * 3 + 1] = 0.85 + Math.random() * 0.15; // G = 0.85-1.0
-      colors[i * 3 + 2] = 0.4 + Math.random() * 0.6;   // B = 0.4-1.0
+      const t = Math.random();
+      colors[i * 3] = burstColors.r[0] + t * (burstColors.r[1] - burstColors.r[0]);
+      colors[i * 3 + 1] = burstColors.g[0] + t * (burstColors.g[1] - burstColors.g[0]);
+      colors[i * 3 + 2] = burstColors.b[0] + t * (burstColors.b[1] - burstColors.b[0]);
     }
 
     geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
@@ -66,7 +69,6 @@ export function CompletionBurst({ position, onComplete }: CompletionBurstProps) 
       return;
     }
 
-    // Advance particle positions by velocity * delta
     const posAttr = pointsRef.current.geometry.getAttribute('position');
     const posArray = posAttr.array as Float32Array;
 
@@ -77,7 +79,6 @@ export function CompletionBurst({ position, onComplete }: CompletionBurstProps) 
     }
     posAttr.needsUpdate = true;
 
-    // Fade opacity
     matRef.current.opacity = 1 - elapsed / DURATION;
 
     invalidate();
@@ -87,7 +88,7 @@ export function CompletionBurst({ position, onComplete }: CompletionBurstProps) 
     <points ref={pointsRef} position={position} geometry={geometry}>
       <pointsMaterial
         ref={matRef}
-        size={0.15}
+        size={0.2}
         vertexColors
         transparent
         toneMapped={false}

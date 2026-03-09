@@ -86,9 +86,9 @@ export function CameraRig() {
     return unsubscribe;
   }, [invalidate]);
 
-  // -- useFrame: damp camera.position toward target (Z + parallax X/Y)
+  // -- useFrame: damp camera.position toward target (Z + parallax X/Y + pan X/Y)
   useFrame((_state, delta) => {
-    const { isAnimating, targetZ, velocity, targetParallaxX, targetParallaxY } = cameraStore.getState();
+    const { isAnimating, targetZ, velocity, targetParallaxX, targetParallaxY, panX, panY } = cameraStore.getState();
     if (!isAnimating) return;
 
     const { nearBoundary, zSmoothTime, springBackSmoothTime, parallaxSmoothTime } = SCENE_CONSTANTS;
@@ -108,17 +108,21 @@ export function CameraRig() {
     // so parallax feels floaty while Z remains responsive
     const combinedSmooth = Math.max(zSmooth, parallaxSmoothTime);
 
+    // Combine pan offset with parallax for target X/Y
+    const targetX = panX + targetParallaxX;
+    const targetY = panY + targetParallaxY;
+
     // Damp camera position toward target (mutates camera.position in-place)
     damp3(
       camera.position,
-      [targetParallaxX, targetParallaxY, effectiveTargetZ],
+      [targetX, targetY, effectiveTargetZ],
       combinedSmooth,
       delta,
     );
 
     // Settle detection — all three axes must be within epsilon
-    const settledX = Math.abs(camera.position.x - targetParallaxX) < 0.01;
-    const settledY = Math.abs(camera.position.y - targetParallaxY) < 0.01;
+    const settledX = Math.abs(camera.position.x - targetX) < 0.01;
+    const settledY = Math.abs(camera.position.y - targetY) < 0.01;
     const settledZ = Math.abs(camera.position.z - effectiveTargetZ) < 0.01;
 
     if (settledX && settledY && settledZ) {

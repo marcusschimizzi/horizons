@@ -36,10 +36,10 @@ export type TagCategory = 'work' | 'personal' | 'health' | 'finance' | 'home' | 
 
 /** Map tag category to display color (used by scene nodes) */
 export const TAG_COLORS: Record<TagCategory, string> = {
-  work: '#3b82f6',     // blue
-  personal: '#f59e0b', // amber
-  health: '#22c55e',   // green
-  finance: '#a855f7',  // purple
-  home: '#f97316',     // orange
-  social: '#ec4899',   // pink
+  work: '#5b8fb9',     // dusky blue
+  personal: '#d4a053', // warm amber
+  health: '#81b29a',   // moss green
+  finance: '#a07cc9',  // soft violet
+  home: '#c97c5d',     // burnt sienna
+  social: '#c97898',   // dusty rose
 };

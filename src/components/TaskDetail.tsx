@@ -6,8 +6,11 @@ import type { TaskRow } from '@/types/task';
 import type { Horizon } from '@/lib/horizons';
 import { getZDepth } from '@/lib/horizons';
 import { horizonToDateRange } from '@/lib/horizon-dates';
+import { getTaskPosition } from '@/lib/spatial';
 import { cameraStore } from '@/stores/camera-store';
 import { SCENE_CONSTANTS } from '@/lib/scene-constants';
+import { useHorizonColors } from '@/lib/horizon-colors';
+import { useExperienceConfig } from '@/stores/theme-store';
 
 const HORIZON_LABELS: Record<string, string> = {
   'immediate': 'Immediate',
@@ -16,15 +19,6 @@ const HORIZON_LABELS: Record<string, string> = {
   'this-quarter': 'This Quarter',
   'this-year': 'This Year',
   'someday': 'Someday',
-};
-
-const HORIZON_COLORS: Record<string, string> = {
-  'immediate': '#ef4444',
-  'this-week': '#f59e0b',
-  'this-month': '#3b82f6',
-  'this-quarter': '#8b5cf6',
-  'this-year': '#6366f1',
-  'someday': '#64748b',
 };
 
 const HORIZON_OPTIONS: { value: Horizon; label: string }[] = [
@@ -42,6 +36,8 @@ export function TaskDetail() {
   const task = useSelectedTask();
   const store = useContext(TaskStoreContext);
   const clearSelection = useTaskStore((s) => s.clearSelection);
+  const horizonColors = useHorizonColors();
+  const { css } = useExperienceConfig();
   const isOpen = task !== null;
 
   const [undoPending, setUndoPending] = useState(false);
@@ -86,6 +82,25 @@ export function TaskDetail() {
       setActionResult(null);
     }
   }, [isOpen]);
+
+  // Pan camera to center on selected task
+  useEffect(() => {
+    if (task) {
+      const pos = getTaskPosition(task.id, task.horizon);
+      cameraStore.getState().setPan(pos.x, pos.y);
+
+      // Also ensure Z depth is visible
+      const horizonZ = getZDepth(task.horizon);
+      const { currentZ } = cameraStore.getState();
+      const isVisible = horizonZ <= currentZ && horizonZ >= currentZ - 15;
+      if (!isVisible && task.horizon !== 'someday') {
+        const targetZ = Math.max(horizonZ + 7.5, SCENE_CONSTANTS.farBoundary);
+        cameraStore.setState({ targetZ, velocity: 0, isAnimating: true });
+      }
+    } else {
+      cameraStore.getState().setPan(0, 0);
+    }
+  }, [task?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Cleanup timeouts on unmount
   useEffect(() => {
@@ -352,6 +367,8 @@ export function TaskDetail() {
 
   // --- Styles ---
 
+  const horizonColor = task ? horizonColors[task.horizon] : horizonColors['someday'];
+
   const panelStyle: React.CSSProperties = {
     position: 'fixed',
     right: 0,
@@ -359,15 +376,18 @@ export function TaskDetail() {
     width: 480,
     maxWidth: '100vw',
     height: '100vh',
-    background: 'rgba(10, 10, 15, 0.92)',
-    backdropFilter: 'blur(16px)',
-    WebkitBackdropFilter: 'blur(16px)',
-    borderLeft: '1px solid rgba(148, 163, 184, 0.15)',
+    background: `${css.bgPrimary}f2`,
+    ...(css.backdropBlur > 0 ? {
+      backdropFilter: `blur(${css.backdropBlur * 2}px)`,
+      WebkitBackdropFilter: `blur(${css.backdropBlur * 2}px)`,
+    } : {}),
+    borderLeft: `2px solid ${horizonColor}`,
+    boxShadow: '-8px 0 32px rgba(0, 0, 0, 0.5)',
     zIndex: 120,
     transform: isOpen ? 'translateX(0)' : 'translateX(100%)',
     transition: 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
-    color: '#e2e8f0',
-    fontFamily: 'monospace',
+    color: css.textPrimary,
+    fontFamily: 'var(--font-body), sans-serif',
     display: 'flex',
     flexDirection: 'column',
     boxSizing: 'border-box',
@@ -388,14 +408,14 @@ export function TaskDetail() {
     alignItems: 'center',
     gap: 12,
     padding: '20px 20px 12px 20px',
-    borderBottom: '1px solid rgba(148, 163, 184, 0.1)',
+    borderBottom: `1px solid ${css.textSecondary}1a`,
   };
 
   const closeBtnStyle: React.CSSProperties = {
     background: 'none',
-    border: '1px solid rgba(148, 163, 184, 0.2)',
+    border: `1px solid ${css.textSecondary}33`,
     borderRadius: 6,
-    color: '#94a3b8',
+    color: css.textSecondary,
     fontSize: 16,
     width: 32,
     height: 32,
@@ -410,10 +430,10 @@ export function TaskDetail() {
     flex: 1,
     background: 'transparent',
     border: 'none',
-    color: '#e2e8f0',
-    fontSize: 18,
+    color: css.textPrimary,
+    fontSize: 22,
     fontWeight: 600,
-    fontFamily: 'monospace',
+    fontFamily: 'var(--font-display), serif',
     outline: 'none',
     padding: 0,
   };
@@ -429,10 +449,11 @@ export function TaskDetail() {
   const badgeStyle = (color: string): React.CSSProperties => ({
     display: 'inline-block',
     padding: '3px 10px',
-    borderRadius: 12,
-    fontSize: 12,
+    borderRadius: 14,
+    fontSize: 11,
     fontWeight: 600,
-    background: `${color}22`,
+    fontFamily: 'var(--font-body), sans-serif',
+    background: `${color}1f`,
     color: color,
     border: `1px solid ${color}44`,
   });
@@ -440,25 +461,26 @@ export function TaskDetail() {
   const driftBadgeStyle: React.CSSProperties = {
     display: 'inline-block',
     padding: '3px 10px',
-    borderRadius: 12,
-    fontSize: 12,
+    borderRadius: 14,
+    fontSize: 11,
     fontWeight: 600,
-    background: 'rgba(245, 158, 11, 0.12)',
-    color: '#f59e0b',
-    border: '1px solid rgba(245, 158, 11, 0.3)',
+    fontFamily: 'var(--font-body), sans-serif',
+    background: `${css.accentDrift}1f`,
+    color: css.accentDrift,
+    border: `1px solid ${css.accentDrift}4d`,
   };
 
   const textareaStyle: React.CSSProperties = {
     flex: 1,
     margin: '0 20px',
     padding: 12,
-    background: 'rgba(30, 30, 40, 0.5)',
-    border: '1px solid rgba(148, 163, 184, 0.1)',
+    background: `${css.bgSurface}80`,
+    border: `1px solid ${css.textSecondary}1a`,
     borderRadius: 8,
-    color: '#cbd5e1',
+    color: css.textPrimary,
     fontSize: 13,
     lineHeight: 1.6,
-    fontFamily: 'monospace',
+    fontFamily: 'var(--font-body), sans-serif',
     resize: 'none',
     outline: 'none',
     minHeight: 120,
@@ -470,8 +492,9 @@ export function TaskDetail() {
 
   const rescheduleLabelStyle: React.CSSProperties = {
     fontSize: 11,
-    color: '#64748b',
-    fontFamily: 'monospace',
+    color: css.textMuted,
+    fontFamily: 'var(--font-body), sans-serif',
+    fontWeight: 500,
     marginBottom: 8,
     textTransform: 'uppercase',
     letterSpacing: '0.05em',
@@ -486,7 +509,7 @@ export function TaskDetail() {
   const actionBarStyle: React.CSSProperties = {
     marginTop: 'auto',
     padding: '16px 20px',
-    borderTop: '1px solid rgba(148, 163, 184, 0.1)',
+    borderTop: `1px solid ${css.textSecondary}1a`,
     display: 'flex',
     gap: 10,
   };
@@ -494,27 +517,27 @@ export function TaskDetail() {
   const btnBase: React.CSSProperties = {
     flex: 1,
     padding: '10px 0',
-    borderRadius: 8,
+    borderRadius: 10,
     border: 'none',
     fontSize: 13,
     fontWeight: 600,
-    fontFamily: 'monospace',
+    fontFamily: 'var(--font-body), sans-serif',
     cursor: 'pointer',
     transition: 'opacity 0.15s ease',
   };
 
   const completeBtnStyle: React.CSSProperties = {
     ...btnBase,
-    background: 'rgba(34, 197, 94, 0.15)',
-    color: '#22c55e',
-    border: '1px solid rgba(34, 197, 94, 0.3)',
+    background: `${css.accentSuccess}26`,
+    color: css.accentSuccess,
+    border: `1px solid ${css.accentSuccess}4d`,
   };
 
   const dropBtnStyle: React.CSSProperties = {
     ...btnBase,
-    background: 'rgba(239, 68, 68, 0.1)',
-    color: '#94a3b8',
-    border: '1px solid rgba(148, 163, 184, 0.15)',
+    background: `${css.textSecondary}1a`,
+    color: css.textSecondary,
+    border: `1px solid ${css.textSecondary}33`,
   };
 
   const overlayStyle: React.CSSProperties = {
@@ -524,7 +547,7 @@ export function TaskDetail() {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    background: 'rgba(10, 10, 15, 0.85)',
+    background: `${css.bgPrimary}d9`,
     zIndex: 1,
     gap: 8,
   };
@@ -539,24 +562,26 @@ export function TaskDetail() {
     alignItems: 'center',
     gap: 12,
     padding: '10px 18px',
-    background: 'rgba(20, 20, 30, 0.9)',
-    backdropFilter: 'blur(12px)',
-    WebkitBackdropFilter: 'blur(12px)',
-    border: '1px solid rgba(148, 163, 184, 0.2)',
+    background: `${css.bgSecondary}e6`,
+    ...(css.backdropBlur > 0 ? {
+      backdropFilter: `blur(${css.backdropBlur + 4}px)`,
+      WebkitBackdropFilter: `blur(${css.backdropBlur + 4}px)`,
+    } : {}),
+    border: `1px solid ${css.accentGlow}1f`,
     borderRadius: 24,
-    fontFamily: 'monospace',
+    fontFamily: 'var(--font-body), sans-serif',
     fontSize: 13,
-    color: '#e2e8f0',
+    color: css.textPrimary,
   };
 
   const undoBtnStyle: React.CSSProperties = {
     background: 'none',
-    border: '1px solid rgba(34, 197, 94, 0.4)',
+    border: `1px solid ${css.accentSuccess}66`,
     borderRadius: 6,
-    color: '#22c55e',
+    color: css.accentSuccess,
     fontSize: 12,
     fontWeight: 600,
-    fontFamily: 'monospace',
+    fontFamily: 'var(--font-body), sans-serif',
     padding: '4px 10px',
     cursor: 'pointer',
   };
@@ -564,11 +589,11 @@ export function TaskDetail() {
   const driftPromptStyle: React.CSSProperties = {
     margin: '0 20px 12px 20px',
     padding: 14,
-    background: 'rgba(245, 158, 11, 0.08)',
-    border: '1px solid rgba(245, 158, 11, 0.2)',
+    background: `${css.accentDrift}14`,
+    border: `1px solid ${css.accentDrift}33`,
     borderRadius: 10,
-    fontFamily: 'monospace',
-    color: '#f59e0b',
+    fontFamily: 'var(--font-body), sans-serif',
+    color: css.accentDrift,
   };
 
   const driftActionBtnStyle = (color: string): React.CSSProperties => ({
@@ -579,45 +604,44 @@ export function TaskDetail() {
     color: color,
     fontSize: 12,
     fontWeight: 600,
-    fontFamily: 'monospace',
+    fontFamily: 'var(--font-body), sans-serif',
     cursor: 'pointer',
   });
 
   const refinementSectionStyle: React.CSSProperties = {
     margin: '0 20px 12px 20px',
     padding: 14,
-    background: 'rgba(136, 170, 255, 0.08)',
-    border: '1px solid rgba(136, 170, 255, 0.2)',
+    background: `${css.accentRefinement}14`,
+    border: `1px solid ${css.accentRefinement}33`,
     borderRadius: 10,
-    fontFamily: 'monospace',
+    fontFamily: 'var(--font-body), sans-serif',
   };
 
   const refinementInputStyle: React.CSSProperties = {
     flex: 1,
     padding: '8px 12px',
-    background: 'rgba(30, 30, 40, 0.5)',
-    border: '1px solid rgba(136, 170, 255, 0.2)',
+    background: `${css.bgSurface}80`,
+    border: `1px solid ${css.accentRefinement}33`,
     borderRadius: 8,
-    color: '#e2e8f0',
+    color: css.textPrimary,
     fontSize: 13,
-    fontFamily: 'monospace',
+    fontFamily: 'var(--font-body), sans-serif',
     outline: 'none',
   };
 
   const refinementSubmitStyle: React.CSSProperties = {
     padding: '8px 16px',
     borderRadius: 8,
-    border: '1px solid rgba(136, 170, 255, 0.3)',
-    background: 'rgba(136, 170, 255, 0.15)',
-    color: '#88aaff',
+    border: `1px solid ${css.accentRefinement}4d`,
+    background: `${css.accentRefinement}26`,
+    color: css.accentRefinement,
     fontSize: 12,
     fontWeight: 600,
-    fontFamily: 'monospace',
+    fontFamily: 'var(--font-body), sans-serif',
     cursor: 'pointer',
     flexShrink: 0,
   };
 
-  const horizonColor = task ? (HORIZON_COLORS[task.horizon] || '#64748b') : '#64748b';
   const horizonLabel = task ? (HORIZON_LABELS[task.horizon] || task.horizon) : '';
 
   return (
@@ -630,14 +654,14 @@ export function TaskDetail() {
             {actionResult === 'completed' && (
               <div style={overlayStyle}>
                 <span style={{ fontSize: 32 }}>&#10003;</span>
-                <span style={{ fontSize: 16, fontWeight: 600, color: '#22c55e' }}>Done</span>
+                <span style={{ fontSize: 16, fontWeight: 600, color: css.accentSuccess }}>Done</span>
               </div>
             )}
 
             {/* Success overlay for dropped */}
             {actionResult === 'dropped' && (
               <div style={overlayStyle}>
-                <span style={{ fontSize: 14, color: '#64748b' }}>Task dropped</span>
+                <span style={{ fontSize: 14, color: css.textMuted }}>Task dropped</span>
               </div>
             )}
 
@@ -666,15 +690,15 @@ export function TaskDetail() {
             {task.needsRefinement && (
               <div style={refinementSectionStyle}>
                 {refinementLoading ? (
-                  <div style={{ fontSize: 12, color: '#64748b', fontStyle: 'italic' }}>
+                  <div style={{ fontSize: 12, color: css.textMuted, fontStyle: 'italic' }}>
                     Generating refinement prompt...
                   </div>
                 ) : refinementData ? (
                   <>
-                    <div style={{ fontSize: 12, color: '#88aaff', marginBottom: 8, lineHeight: 1.5 }}>
+                    <div style={{ fontSize: 12, color: css.accentRefinement, marginBottom: 8, lineHeight: 1.5 }}>
                       {refinementData.clarifyingQuestion}
                     </div>
-                    <div style={{ fontSize: 11, color: '#64748b', marginBottom: 10 }}>
+                    <div style={{ fontSize: 11, color: css.textMuted, marginBottom: 10 }}>
                       Suggested: &ldquo;{refinementData.suggestedTitle}&rdquo;
                     </div>
                     <div style={{ display: 'flex', gap: 8 }}>
@@ -710,17 +734,17 @@ export function TaskDetail() {
               <div style={reschedulePillsStyle}>
                 {HORIZON_OPTIONS.map((opt) => {
                   const isCurrent = task.horizon === opt.value;
-                  const color = HORIZON_COLORS[opt.value] || '#64748b';
+                  const color = horizonColors[opt.value];
                   const pillStyle: React.CSSProperties = {
                     padding: '5px 12px',
                     borderRadius: 16,
                     fontSize: 12,
                     fontWeight: 600,
-                    fontFamily: 'monospace',
+                    fontFamily: 'var(--font-body), sans-serif',
                     cursor: isCurrent ? 'default' : 'pointer',
-                    border: `1px solid ${isCurrent ? color : 'rgba(148, 163, 184, 0.2)'}`,
-                    background: isCurrent ? `${color}22` : 'rgba(30, 30, 40, 0.5)',
-                    color: isCurrent ? color : '#94a3b8',
+                    border: `1px solid ${isCurrent ? color : `${css.textSecondary}33`}`,
+                    background: isCurrent ? `${color}33` : `${css.bgSurface}80`,
+                    color: isCurrent ? color : css.textSecondary,
                     transition: 'all 0.15s ease',
                   };
                   return (
@@ -744,13 +768,13 @@ export function TaskDetail() {
                   This has moved {task.driftCount} times. What&apos;s in the way?
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
-                  <button style={driftActionBtnStyle('#3b82f6')} onClick={() => handleReschedule(task.horizon)}>
+                  <button style={driftActionBtnStyle(horizonColors['this-year'])} onClick={() => handleReschedule(task.horizon)}>
                     Recommit
                   </button>
-                  <button style={driftActionBtnStyle('#64748b')} onClick={() => handleReschedule('someday')}>
+                  <button style={driftActionBtnStyle(horizonColors['someday'])} onClick={() => handleReschedule('someday')}>
                     Snooze
                   </button>
-                  <button style={driftActionBtnStyle('#ef4444')} onClick={handleDrop}>
+                  <button style={driftActionBtnStyle(css.accentDrift)} onClick={handleDrop}>
                     Drop
                   </button>
                 </div>

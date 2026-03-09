@@ -4,6 +4,8 @@ import { useState, useMemo, useContext } from 'react';
 import { useTasksWithHorizon, useTaskStore, TaskStoreContext } from '@/stores/task-store';
 import { horizonToDateRange } from '@/lib/horizon-dates';
 import type { Horizon } from '@/lib/horizons';
+import { useHorizonColors } from '@/lib/horizon-colors';
+import { useExperienceConfig } from '@/stores/theme-store';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -27,15 +29,6 @@ const HORIZON_LABELS: Record<string, string> = {
   'someday': 'Someday',
 };
 
-const HORIZON_COLORS: Record<string, string> = {
-  'immediate': '#ef4444',
-  'this-week': '#f97316',
-  'this-month': '#eab308',
-  'this-quarter': '#22c55e',
-  'this-year': '#3b82f6',
-  'someday': '#8b5cf6',
-};
-
 const TAG_OPTIONS = ['work', 'personal', 'health', 'finance', 'home', 'social'] as const;
 
 // ---------------------------------------------------------------------------
@@ -47,6 +40,8 @@ export function ListView() {
   const store = useContext(TaskStoreContext);
   const listFilters = useTaskStore((s) => s.listFilters);
   const setListFilter = useTaskStore((s) => s.setListFilter);
+  const horizonColors = useHorizonColors();
+  const { css } = useExperienceConfig();
   const [collapsedSections, setCollapsedSections] = useState<Set<string>>(new Set());
   const [rescheduleOpenId, setRescheduleOpenId] = useState<string | null>(null);
 
@@ -139,24 +134,34 @@ export function ListView() {
     setRescheduleOpenId(null);
   };
 
+  const tagColors = css.tags as Record<string, string>;
+
   return (
     <div
       style={{
         position: 'fixed',
         inset: 0,
         zIndex: 1,
-        background: '#0a0a0f',
+        background: css.bgPrimary,
         overflowY: 'auto',
-        fontFamily: 'monospace',
+        fontFamily: 'var(--font-body), sans-serif',
       }}
     >
+      {/* Stagger animation keyframe */}
+      <style>{`
+        @keyframes listRowReveal {
+          from { opacity: 0; transform: translateY(6px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+
       {/* Filter bar */}
       <div
         style={{
           position: 'sticky',
           top: 0,
-          background: '#0a0a0f',
-          borderBottom: '1px solid rgba(148,163,184,0.1)',
+          background: css.bgPrimary,
+          borderBottom: `1px solid ${css.textSecondary}1a`,
           padding: '60px 20px 12px 20px',
           display: 'flex',
           flexWrap: 'wrap',
@@ -164,58 +169,67 @@ export function ListView() {
           zIndex: 2,
         }}
       >
-        {TAG_OPTIONS.map((tag) => (
-          <button
-            key={tag}
-            onClick={() => toggleTagFilter(tag)}
-            style={{
-              padding: '4px 10px',
-              borderRadius: 20,
-              border: `1px solid ${listFilters.tags.has(tag) ? '#3b82f6' : 'rgba(148,163,184,0.2)'}`,
-              background: listFilters.tags.has(tag) ? 'rgba(59,130,246,0.15)' : 'transparent',
-              color: listFilters.tags.has(tag) ? '#3b82f6' : '#64748b',
-              fontSize: 11,
-              fontFamily: 'monospace',
-              cursor: 'pointer',
-            }}
-          >
-            {tag}
-          </button>
-        ))}
+        {TAG_OPTIONS.map((tag) => {
+          const tagColor = tagColors[tag] ?? css.textSecondary;
+          return (
+            <button
+              key={tag}
+              onClick={() => toggleTagFilter(tag)}
+              style={{
+                padding: '4px 10px',
+                borderRadius: 20,
+                border: `1px solid ${listFilters.tags.has(tag) ? tagColor : `${css.textSecondary}33`}`,
+                background: listFilters.tags.has(tag) ? `${tagColor}1f` : 'transparent',
+                color: listFilters.tags.has(tag) ? tagColor : css.textMuted,
+                fontSize: 11,
+                fontFamily: 'var(--font-body), sans-serif',
+                fontWeight: 500,
+                cursor: 'pointer',
+              }}
+            >
+              {tag}
+            </button>
+          );
+        })}
         <button
           onClick={toggleRefinementFilter}
           style={{
             padding: '4px 10px',
             borderRadius: 20,
-            border: `1px solid ${listFilters.needsRefinement === true ? '#88aaff' : 'rgba(148,163,184,0.2)'}`,
-            background: listFilters.needsRefinement === true ? 'rgba(136,170,255,0.15)' : 'transparent',
-            color: listFilters.needsRefinement === true ? '#88aaff' : '#64748b',
+            border: `1px solid ${listFilters.needsRefinement === true ? css.accentRefinement : `${css.textSecondary}33`}`,
+            background: listFilters.needsRefinement === true ? `${css.accentRefinement}26` : 'transparent',
+            color: listFilters.needsRefinement === true ? css.accentRefinement : css.textMuted,
             fontSize: 11,
-            fontFamily: 'monospace',
+            fontFamily: 'var(--font-body), sans-serif',
+            fontWeight: 500,
             cursor: 'pointer',
           }}
         >
           needs refinement
         </button>
-        <span style={{ width: 1, background: 'rgba(148,163,184,0.15)', alignSelf: 'stretch', margin: '0 4px' }} />
-        {HORIZON_ORDER.map((h) => (
-          <button
-            key={h}
-            onClick={() => toggleHorizonFilter(h)}
-            style={{
-              padding: '4px 10px',
-              borderRadius: 20,
-              border: `1px solid ${listFilters.horizons.has(h) ? HORIZON_COLORS[h] : 'rgba(148,163,184,0.2)'}`,
-              background: listFilters.horizons.has(h) ? `${HORIZON_COLORS[h]}18` : 'transparent',
-              color: listFilters.horizons.has(h) ? HORIZON_COLORS[h] : '#64748b',
-              fontSize: 11,
-              fontFamily: 'monospace',
-              cursor: 'pointer',
-            }}
-          >
-            {HORIZON_LABELS[h]}
-          </button>
-        ))}
+        <span style={{ width: 1, background: `${css.textSecondary}26`, alignSelf: 'stretch', margin: '0 4px' }} />
+        {HORIZON_ORDER.map((h) => {
+          const hColor = horizonColors[h as Horizon];
+          return (
+            <button
+              key={h}
+              onClick={() => toggleHorizonFilter(h)}
+              style={{
+                padding: '4px 10px',
+                borderRadius: 20,
+                border: `1px solid ${listFilters.horizons.has(h) ? hColor : `${css.textSecondary}33`}`,
+                background: listFilters.horizons.has(h) ? `${hColor}26` : 'transparent',
+                color: listFilters.horizons.has(h) ? hColor : css.textMuted,
+                fontSize: 11,
+                fontFamily: 'var(--font-body), sans-serif',
+                fontWeight: 500,
+                cursor: 'pointer',
+              }}
+            >
+              {HORIZON_LABELS[h]}
+            </button>
+          );
+        })}
       </div>
 
       {/* Horizon groups */}
@@ -224,7 +238,7 @@ export function ListView() {
           const sectionTasks = grouped.get(horizon) || [];
           if (sectionTasks.length === 0) return null;
           const isCollapsed = collapsedSections.has(horizon);
-          const color = HORIZON_COLORS[horizon];
+          const color = horizonColors[horizon as Horizon];
 
           return (
             <div key={horizon}>
@@ -237,21 +251,20 @@ export function ListView() {
                   gap: 10,
                   padding: '12px 20px',
                   borderLeft: `3px solid ${color}`,
-                  background: 'rgba(255,255,255,0.02)',
+                  background: `${css.textPrimary}05`,
                   cursor: 'pointer',
                   userSelect: 'none',
                 }}
               >
-                <span style={{ fontSize: 10, color: '#64748b' }}>
+                <span style={{ fontSize: 10, color: css.textMuted }}>
                   {isCollapsed ? '\u25B6' : '\u25BC'}
                 </span>
                 <span
                   style={{
-                    fontSize: 13,
-                    fontWeight: 600,
+                    fontSize: 16,
+                    fontWeight: 500,
+                    fontFamily: 'var(--font-display), serif',
                     color,
-                    letterSpacing: '0.05em',
-                    textTransform: 'uppercase',
                   }}
                 >
                   {HORIZON_LABELS[horizon]}
@@ -260,8 +273,8 @@ export function ListView() {
                   style={{
                     marginLeft: 'auto',
                     fontSize: 11,
-                    color: '#64748b',
-                    background: 'rgba(100,116,139,0.15)',
+                    color: css.textMuted,
+                    background: `${css.textMuted}26`,
                     padding: '2px 8px',
                     borderRadius: 10,
                   }}
@@ -272,7 +285,7 @@ export function ListView() {
 
               {/* Task rows */}
               {!isCollapsed &&
-                sectionTasks.map((task) => (
+                sectionTasks.map((task, rowIndex) => (
                   <div
                     key={task.id}
                     style={{
@@ -281,8 +294,10 @@ export function ListView() {
                       alignItems: 'center',
                       gap: 10,
                       padding: '10px 20px',
-                      borderBottom: '1px solid rgba(148,163,184,0.05)',
+                      borderBottom: `1px solid ${css.textSecondary}0d`,
                       flexWrap: 'wrap',
+                      animation: 'listRowReveal 0.3s ease both',
+                      animationDelay: `${rowIndex * 50}ms`,
                     }}
                   >
                     {/* Title */}
@@ -292,7 +307,7 @@ export function ListView() {
                         flex: 1,
                         minWidth: 0,
                         fontSize: 13,
-                        color: '#e2e8f0',
+                        color: css.textPrimary,
                         cursor: 'pointer',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
@@ -309,7 +324,7 @@ export function ListView() {
                             width: 6,
                             height: 6,
                             borderRadius: '50%',
-                            background: '#88aaff',
+                            background: css.accentRefinement,
                             flexShrink: 0,
                             display: 'inline-block',
                           }}
@@ -324,9 +339,9 @@ export function ListView() {
                           fontSize: 10,
                           padding: '1px 6px',
                           borderRadius: 10,
-                          background: 'rgba(245,158,11,0.15)',
-                          border: '1px solid rgba(245,158,11,0.3)',
-                          color: '#f59e0b',
+                          background: `${css.accentDrift}26`,
+                          border: `1px solid ${css.accentDrift}4d`,
+                          color: css.accentDrift,
                         }}
                       >
                         {task.driftCount}
@@ -334,20 +349,23 @@ export function ListView() {
                     )}
 
                     {/* Tags */}
-                    {(task.tags || []).map((tag) => (
-                      <span
-                        key={tag}
-                        style={{
-                          fontSize: 10,
-                          padding: '1px 6px',
-                          borderRadius: 10,
-                          background: 'rgba(148,163,184,0.08)',
-                          color: '#64748b',
-                        }}
-                      >
-                        {tag}
-                      </span>
-                    ))}
+                    {(task.tags || []).map((tag) => {
+                      const tColor = tagColors[tag] ?? css.textSecondary;
+                      return (
+                        <span
+                          key={tag}
+                          style={{
+                            fontSize: 10,
+                            padding: '1px 6px',
+                            borderRadius: 10,
+                            background: `${tColor}1f`,
+                            color: tColor,
+                          }}
+                        >
+                          {tag}
+                        </span>
+                      );
+                    })}
 
                     {/* Quick actions */}
                     <div style={{ display: 'flex', gap: 4, flexShrink: 0 }}>
@@ -355,12 +373,12 @@ export function ListView() {
                         onClick={() => handleQuickComplete(task.id)}
                         style={{
                           padding: '4px 10px',
-                          borderRadius: 6,
-                          border: '1px solid rgba(34,197,94,0.2)',
-                          background: 'rgba(34,197,94,0.08)',
-                          color: '#22c55e',
+                          borderRadius: 8,
+                          border: `1px solid ${css.accentSuccess}33`,
+                          background: `${css.accentSuccess}14`,
+                          color: css.accentSuccess,
                           fontSize: 11,
-                          fontFamily: 'monospace',
+                          fontFamily: 'var(--font-body), sans-serif',
                           cursor: 'pointer',
                         }}
                       >
@@ -370,12 +388,12 @@ export function ListView() {
                         onClick={() => handleQuickDrop(task.id)}
                         style={{
                           padding: '4px 10px',
-                          borderRadius: 6,
-                          border: '1px solid rgba(148,163,184,0.2)',
-                          background: 'rgba(148,163,184,0.08)',
-                          color: '#64748b',
+                          borderRadius: 8,
+                          border: `1px solid ${css.textSecondary}33`,
+                          background: `${css.textSecondary}14`,
+                          color: css.textSecondary,
                           fontSize: 11,
-                          fontFamily: 'monospace',
+                          fontFamily: 'var(--font-body), sans-serif',
                           cursor: 'pointer',
                         }}
                       >
@@ -387,12 +405,12 @@ export function ListView() {
                         }
                         style={{
                           padding: '4px 10px',
-                          borderRadius: 6,
-                          border: '1px solid rgba(59,130,246,0.2)',
-                          background: 'rgba(59,130,246,0.08)',
-                          color: '#3b82f6',
+                          borderRadius: 8,
+                          border: `1px solid ${css.accentGlow}33`,
+                          background: `${css.accentGlow}14`,
+                          color: css.accentGlow,
                           fontSize: 11,
-                          fontFamily: 'monospace',
+                          fontFamily: 'var(--font-body), sans-serif',
                           cursor: 'pointer',
                         }}
                       >
@@ -408,34 +426,37 @@ export function ListView() {
                           right: 20,
                           top: '100%',
                           zIndex: 10,
-                          background: '#131320',
-                          border: '1px solid rgba(148,163,184,0.15)',
+                          background: css.bgSurface,
+                          border: `1px solid ${css.textSecondary}26`,
                           borderRadius: 8,
                           overflow: 'hidden',
                           minWidth: 140,
                         }}
                       >
-                        {HORIZON_ORDER.map((h) => (
-                          <button
-                            key={h}
-                            onClick={() => handleQuickReschedule(task.id, h as Horizon)}
-                            style={{
-                              display: 'block',
-                              width: '100%',
-                              padding: '8px 14px',
-                              textAlign: 'left',
-                              border: 'none',
-                              background:
-                                h === task.horizon ? 'rgba(59,130,246,0.15)' : 'transparent',
-                              color: h === task.horizon ? '#3b82f6' : '#94a3b8',
-                              fontSize: 12,
-                              fontFamily: 'monospace',
-                              cursor: 'pointer',
-                            }}
-                          >
-                            {HORIZON_LABELS[h]}
-                          </button>
-                        ))}
+                        {HORIZON_ORDER.map((h) => {
+                          const hColor = horizonColors[h as Horizon];
+                          return (
+                            <button
+                              key={h}
+                              onClick={() => handleQuickReschedule(task.id, h as Horizon)}
+                              style={{
+                                display: 'block',
+                                width: '100%',
+                                padding: '8px 14px',
+                                textAlign: 'left',
+                                border: 'none',
+                                background:
+                                  h === task.horizon ? `${hColor}33` : 'transparent',
+                                color: h === task.horizon ? hColor : css.textSecondary,
+                                fontSize: 12,
+                                fontFamily: 'var(--font-body), sans-serif',
+                                cursor: 'pointer',
+                              }}
+                            >
+                              {HORIZON_LABELS[h]}
+                            </button>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
@@ -446,7 +467,7 @@ export function ListView() {
       </div>
 
       {filteredTasks.length === 0 && (
-        <div style={{ textAlign: 'center', padding: '60px 20px', color: '#64748b', fontSize: 13 }}>
+        <div style={{ textAlign: 'center', padding: '60px 20px', color: css.textMuted, fontSize: 13 }}>
           No tasks match the current filters
         </div>
       )}

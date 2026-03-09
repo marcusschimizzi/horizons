@@ -1,15 +1,83 @@
 @import "tailwindcss";
 
 @theme {
-  --color-horizon-immediate: #ef4444;
-  --color-horizon-this-week: #f59e0b;
-  --color-horizon-this-month: #3b82f6;
-  --color-horizon-this-quarter: #8b5cf6;
-  --color-horizon-this-year: #06b6d4;
-  --color-horizon-someday: #6b7280;
+  /* Horizon colors — warm bioluminescent palette (defaults) */
+  --color-horizon-immediate: #e07a5f;
+  --color-horizon-this-week: #d4a053;
+  --color-horizon-this-month: #81b29a;
+  --color-horizon-this-quarter: #3d9f94;
+  --color-horizon-this-year: #5b8fb9;
+  --color-horizon-someday: #7a6f63;
 
-  --color-bg-primary: #0a0a0f;
-  --color-bg-secondary: #12121a;
-  --color-text-primary: #e2e8f0;
-  --color-text-secondary: #94a3b8;
+  /* Backgrounds — warm umber-tinted darks */
+  --color-bg-primary: #0d0b08;
+  --color-bg-secondary: #16120e;
+  --color-bg-surface: #1e1914;
+
+  /* Text — warm cream tones */
+  --color-text-primary: #ede6db;
+  --color-text-secondary: #9c8e7c;
+  --color-text-muted: #6b5e50;
+
+  /* Accent colors */
+  --color-accent-glow: #d4a053;
+  --color-accent-success: #81b29a;
+  --color-accent-refinement: #7eb8b0;
+  --color-accent-drift: #c97c5d;
+}
+
+/* ─── Font semantic aliases (theme-switchable) ─── */
+
+:root,
+[data-theme="bioluminescent"] {
+  --font-display: var(--font-fraunces), serif;
+  --font-body: var(--font-dm-sans), sans-serif;
+}
+
+/* ─── White Void overrides ─── */
+
+[data-theme="whitevoid"] {
+  --font-display: var(--font-lora), serif;
+  --font-body: var(--font-lora), serif;
+  --font-mono: var(--font-geist-mono), monospace;
+
+  /* Horizon colors — ink on paper */
+  --color-horizon-immediate: #c0392b;
+  --color-horizon-this-week: #e76b2e;
+  --color-horizon-this-month: #1e3a5f;
+  --color-horizon-this-quarter: #2d5016;
+  --color-horizon-this-year: #4a2c6b;
+  --color-horizon-someday: #8b7d6b;
+
+  /* Backgrounds — warm paper */
+  --color-bg-primary: #f5f0e8;
+  --color-bg-secondary: #eee8dd;
+  --color-bg-surface: #fdf8f0;
+
+  /* Text — dark ink */
+  --color-text-primary: #1a1605;
+  --color-text-secondary: #4a3f30;
+  --color-text-muted: #8b7d6b;
+
+  /* Accent colors — muted ink tones */
+  --color-accent-glow: #1a1605;
+  --color-accent-success: #2d5016;
+  --color-accent-refinement: #1e3a5f;
+  --color-accent-drift: #7c3a2b;
+}
+
+/* ─── Paper texture backgrounds (whitevoid only) ─── */
+
+[data-theme="whitevoid"] .texture-dots {
+  background-image: radial-gradient(circle, #d4ccc4 0.5px, transparent 0.5px);
+  background-size: 12px 12px;
+}
+
+[data-theme="whitevoid"] .texture-ruled {
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 23px,
+    #d4ccc4 23px,
+    #d4ccc4 24px
+  );
 }
