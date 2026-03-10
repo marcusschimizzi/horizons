@@ -5,11 +5,12 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
+    "build:deploy": "npm run db:migrate && next build",
     "start": "next start",
     "lint": "eslint",
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
+    "db:migrate": "node --import=tsx src/db/migrate.ts",
     "db:seed": "node --env-file=.env.local --import=tsx src/db/seed.ts",
     "db:studio": "drizzle-kit studio",
     "test": "vitest run",
