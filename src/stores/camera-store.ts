@@ -13,6 +13,8 @@ interface CameraState {
   isAnimating: boolean;
   targetParallaxX: number;
   targetParallaxY: number;
+  panX: number;
+  panY: number;
 }
 
 interface CameraActions {
@@ -20,6 +22,7 @@ interface CameraActions {
   tick: (newZ: number, settled: boolean) => void;
   snapToPresent: () => void;
   setParallax: (x: number, y: number) => void;
+  setPan: (x: number, y: number) => void;
 }
 
 type CameraStore = CameraState & CameraActions;
@@ -31,6 +34,8 @@ export const cameraStore = createStore<CameraStore>()((set, get) => ({
   isAnimating: false,
   targetParallaxX: 0,
   targetParallaxY: 0,
+  panX: 0,
+  panY: 0,
 
   scroll: (deltaZ: number) => {
     const { targetZ } = get();
@@ -68,6 +73,10 @@ export const cameraStore = createStore<CameraStore>()((set, get) => ({
 
   setParallax: (x: number, y: number) => {
     set({ targetParallaxX: x, targetParallaxY: y, isAnimating: true });
+  },
+
+  setPan: (x: number, y: number) => {
+    set({ panX: x, panY: y, isAnimating: true });
   },
 }));
 

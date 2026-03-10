@@ -5,6 +5,7 @@ import { TaskStoreContext, deserializeTask } from '@/stores/task-store';
 import { getHorizon, getZDepth } from '@/lib/horizons';
 import { cameraStore } from '@/stores/camera-store';
 import { SCENE_CONSTANTS } from '@/lib/scene-constants';
+import { useExperienceConfig } from '@/stores/theme-store';
 import type { TaskRow } from '@/types/task';
 import type { ParsedTask } from '@/app/api/parse/route';
 
@@ -41,6 +42,7 @@ export function InputBubble() {
   const toastFadeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const store = useContext(TaskStoreContext);
+  const { css } = useExperienceConfig();
 
   // Clean up timers on unmount
   useEffect(() => {
@@ -213,10 +215,10 @@ export function InputBubble() {
   };
 
   const borderColor = isFocused
-    ? 'rgba(148, 163, 184, 0.4)'
+    ? `${css.accentGlow}66`
     : isHovered
-      ? 'rgba(148, 163, 184, 0.3)'
-      : 'rgba(148, 163, 184, 0.2)';
+      ? `${css.accentGlow}40`
+      : `${css.accentGlow}26`;
 
   const inputWrapperStyle: React.CSSProperties = {
     position: 'relative',
@@ -226,20 +228,27 @@ export function InputBubble() {
   const inputStyle: React.CSSProperties = {
     width: '100%',
     boxSizing: 'border-box',
-    background: 'rgba(18, 18, 26, 0.85)',
-    backdropFilter: 'blur(12px)',
-    WebkitBackdropFilter: 'blur(12px)',
+    background: `${css.bgSecondary}e6`,
+    ...(css.backdropBlur > 0 ? {
+      backdropFilter: `blur(${css.backdropBlur + 4}px)`,
+      WebkitBackdropFilter: `blur(${css.backdropBlur + 4}px)`,
+    } : {}),
     border: `1px solid ${borderColor}`,
-    borderRadius: 24,
+    borderRadius: 28,
     padding: '12px 48px 12px 20px',
-    color: '#e2e8f0',
+    color: css.textPrimary,
     fontSize: 14,
-    fontFamily: 'monospace',
+    fontFamily: 'var(--font-body), sans-serif',
     outline: 'none',
-    transition: 'border-color 0.2s ease',
+    transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
+    ...(isFocused
+      ? { boxShadow: `0 0 16px ${css.accentGlow}14` }
+      : {}),
     ...(isLoading
       ? { animation: 'inputPulse 1.2s ease-in-out infinite' }
-      : {}),
+      : !isFocused
+        ? { animation: 'inputBreathing 4s ease-in-out infinite' }
+        : {}),
   };
 
   const submitButtonStyle: React.CSSProperties = {
@@ -250,13 +259,13 @@ export function InputBubble() {
     width: 28,
     height: 28,
     borderRadius: '50%',
-    background: 'rgba(148, 163, 184, 0.1)',
+    background: `${css.accentGlow}1a`,
     border: 'none',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     cursor: 'pointer',
-    color: submitHovered ? '#e2e8f0' : '#94a3b8',
+    color: submitHovered ? css.textPrimary : css.textSecondary,
     opacity: showSubmitButton ? 1 : 0,
     pointerEvents: showSubmitButton ? 'auto' : 'none',
     transition: 'opacity 0.2s ease, color 0.2s ease',
@@ -278,9 +287,9 @@ export function InputBubble() {
   };
 
   const errorStyle: React.CSSProperties = {
-    color: '#f87171',
+    color: css.accentDrift,
     fontSize: 12,
-    fontFamily: 'monospace',
+    fontFamily: 'var(--font-body), sans-serif',
     opacity: error ? 1 : 0,
     transition: 'opacity 0.3s ease',
     marginTop: 4,
@@ -289,15 +298,17 @@ export function InputBubble() {
   };
 
   const toastStyle: React.CSSProperties = {
-    background: 'rgba(18, 18, 26, 0.9)',
-    backdropFilter: 'blur(12px)',
-    WebkitBackdropFilter: 'blur(12px)',
-    border: '1px solid rgba(148, 163, 184, 0.15)',
+    background: `${css.bgSecondary}e6`,
+    ...(css.backdropBlur > 0 ? {
+      backdropFilter: `blur(${css.backdropBlur + 4}px)`,
+      WebkitBackdropFilter: `blur(${css.backdropBlur + 4}px)`,
+    } : {}),
+    border: `1px solid ${css.accentGlow}1f`,
     borderRadius: 16,
     padding: '8px 16px',
     fontSize: 12,
-    fontFamily: 'monospace',
-    color: '#94a3b8',
+    fontFamily: 'var(--font-body), sans-serif',
+    color: css.textSecondary,
     opacity: toastFading ? 0 : 1,
     transition: 'opacity 0.5s ease',
     pointerEvents: 'none',
@@ -312,8 +323,12 @@ export function InputBubble() {
       {/* Injected keyframe animation for loading pulse */}
       <style>{`
         @keyframes inputPulse {
-          0%, 100% { border-color: rgba(148, 163, 184, 0.2); }
-          50% { border-color: rgba(148, 163, 184, 0.5); }
+          0%, 100% { border-color: ${css.accentGlow}26; }
+          50% { border-color: ${css.accentGlow}66; }
+        }
+        @keyframes inputBreathing {
+          0%, 100% { border-color: ${css.accentGlow}1f; }
+          50% { border-color: ${css.accentGlow}38; }
         }
         @keyframes loadingDot {
           0%, 80%, 100% { opacity: 0.2; }
@@ -383,7 +398,7 @@ export function InputBubble() {
                   width: 4,
                   height: 4,
                   borderRadius: '50%',
-                  background: '#94a3b8',
+                  background: css.accentGlow,
                   animation: `loadingDot 1.2s ease-in-out ${i * 0.2}s infinite`,
                 }}
               />

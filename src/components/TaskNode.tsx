@@ -1,18 +1,15 @@
 'use client';
 
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { damp3 } from 'maath/easing';
 import * as THREE from 'three';
 
 import type { Task } from '@/types/task';
-import { SCENE_CONSTANTS } from '@/lib/scene-constants';
+import { useSceneConfig } from '@/stores/theme-store';
 import { useIsNewTask } from '@/stores/task-store';
 import { TaskCard } from './TaskCard';
 import { TaskSprite } from './TaskSprite';
-
-// O(1) lookup set from the scene constants
-const cardHorizonsSet = new Set<string>(SCENE_CONSTANTS.cardHorizons);
 
 // Smoothing time for position drift (seconds) — lower = snappier
 const DRIFT_SMOOTH_TIME = 0.4;
@@ -25,9 +22,14 @@ export interface TaskNodeProps {
 }
 
 export function TaskNode({ task, position }: TaskNodeProps) {
-  // Categorical LOD split: immediate + this-week render as cards, rest as sprites.
-  // Kept as explicit variable so Phase 4 can extend with camera distance + hysteresis.
-  const isCard = cardHorizonsSet.has(task.horizon);
+  const sceneConfig = useSceneConfig();
+
+  // LOD: all-cards means everything is a card; horizon-split uses cardHorizons set
+  const isCard = useMemo(() => {
+    if (sceneConfig.lodStrategy === 'all-cards') return true;
+    return sceneConfig.cardHorizons.includes(task.horizon);
+  }, [sceneConfig.lodStrategy, sceneConfig.cardHorizons, task.horizon]);
+
   const isNew = useIsNewTask(task.id);
   const groupRef = useRef<THREE.Group>(null);
   const invalidate = useThree((state) => state.invalidate);
@@ -44,7 +46,6 @@ export function TaskNode({ task, position }: TaskNodeProps) {
       delta,
     );
 
-    // Keep requesting frames while still animating
     if (changed) {
       const dx = groupRef.current.position.x - target[0];
       const dy = groupRef.current.position.y - target[1];

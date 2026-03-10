@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { cameraStore, useCameraStore } from '@/stores/camera-store';
+import { useExperienceConfig } from '@/stores/theme-store';
 import { SCENE_CONSTANTS } from '@/lib/scene-constants';
 
 // ---------------------------------------------------------------------------
@@ -12,6 +13,7 @@ export function SnapToPresent() {
   const isAway = useCameraStore(
     (s) => Math.abs(s.currentZ - SCENE_CONSTANTS.cameraRestZ) > SCENE_CONSTANTS.snapDistanceThreshold,
   );
+  const { css } = useExperienceConfig();
   const [hovered, setHovered] = useState(false);
 
   const handleClick = () => {
@@ -33,15 +35,17 @@ export function SnapToPresent() {
     display: 'flex',
     alignItems: 'center',
     gap: 6,
-    background: 'rgba(10, 10, 15, 0.85)',
-    backdropFilter: 'blur(8px)',
-    WebkitBackdropFilter: 'blur(8px)',
-    border: `1px solid ${hovered ? 'rgba(148, 163, 184, 0.4)' : 'rgba(148, 163, 184, 0.2)'}`,
+    background: `${css.bgPrimary}d9`,
+    ...(css.backdropBlur > 0 ? {
+      backdropFilter: `blur(${css.backdropBlur}px)`,
+      WebkitBackdropFilter: `blur(${css.backdropBlur}px)`,
+    } : {}),
+    border: `1px solid ${hovered ? `${css.accentGlow}4d` : `${css.accentGlow}1f`}`,
     borderRadius: 20,
     padding: '8px 20px',
-    color: hovered ? '#e2e8f0' : '#94a3b8',
+    color: hovered ? css.textPrimary : css.textSecondary,
     fontSize: 13,
-    fontFamily: 'monospace',
+    fontFamily: 'var(--font-body), sans-serif',
     cursor: 'pointer',
     transition: 'color 0.2s ease, border-color 0.2s ease',
     outline: 'none',
