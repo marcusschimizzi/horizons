@@ -4,7 +4,7 @@ import { useState, useEffect, useContext } from 'react';
 import { Html } from '@react-three/drei';
 import type { Task } from '@/types/task';
 import { useExperienceConfig } from '@/stores/theme-store';
-import { TaskStoreContext, useIsCompleting, useIsDropping } from '@/stores/task-store';
+import { TaskStoreContext, useTaskStore, useIsCompleting, useIsDropping } from '@/stores/task-store';
 import { getInkColor, getInkShadowAlpha } from '@/lib/ink-weight';
 
 interface TaskCardProps {
@@ -21,6 +21,9 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
   const isDrifted = task.driftCount > 0;
   const { css, scene } = useExperienceConfig();
   const { htmlDistanceFactor, inkWeight } = scene;
+  const selectedTaskId = useTaskStore((s) => s.selectedTaskId);
+  const isSelected = selectedTaskId === task.id;
+  const isDimmed = selectedTaskId !== null && !isSelected;
 
   // Entrance state: existing tasks start entered, new tasks start un-entered
   const [entered, setEntered] = useState(!isNew);
@@ -83,15 +86,13 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
     fontSize: 13,
     lineHeight: 1.3,
     whiteSpace: 'nowrap',
-    overflow: 'hidden',
+    overflow: 'visible',
     textOverflow: 'ellipsis',
     pointerEvents: 'auto',
     cursor: 'pointer',
-    opacity: entered ? driftOpacity : 0,
-    transform: entered ? 'scale(1)' : 'scale(0.85)',
-    ...(isNew
-      ? { transition: 'opacity 0.5s ease-out, transform 0.5s ease-out' }
-      : {}),
+    opacity: entered ? (isDimmed ? driftOpacity * 0.25 : driftOpacity) : 0,
+    transform: entered ? (isSelected ? 'scale(1.04)' : 'scale(1)') : 'scale(0.85)',
+    transition: 'opacity 0.3s ease, transform 0.3s ease',
     ...(pulseAnimation ? { animation: pulseAnimation } : {}),
     ...(isDrifted
       ? {
@@ -118,6 +119,7 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
       <Html
         center
         distanceFactor={htmlDistanceFactor}
+        zIndexRange={[110, 0]}
         style={{ pointerEvents: 'none' }}
       >
         <>
@@ -132,7 +134,7 @@ export function TaskCard({ task, position, isNew }: TaskCardProps) {
             }
           `}</style>
           <div style={cardStyle} onClick={() => store?.getState().selectTask(task.id)}>
-            {task.title}
+            <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis' }}>{task.title}</span>
             {isDrifted && (
               <span style={{
                 position: 'absolute',

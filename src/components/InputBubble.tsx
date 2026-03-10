@@ -115,6 +115,7 @@ export function InputBubble() {
     const now = new Date();
     const tempTask: TaskRow = {
       id: tempId,
+      userId: '', // placeholder — replaced by real task from API
       rawInput: trimmed,
       title: parsed.title,
       targetDateEarliest: parsed.targetDateEarliest ? new Date(parsed.targetDateEarliest) : null,

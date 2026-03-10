@@ -83,20 +83,18 @@ export function TaskDetail() {
     }
   }, [isOpen]);
 
-  // Pan camera to center on selected task
+  // Pan + zoom camera to center on selected task
   useEffect(() => {
     if (task) {
       const pos = getTaskPosition(task.id, task.horizon);
       cameraStore.getState().setPan(pos.x, pos.y);
 
-      // Also ensure Z depth is visible
+      // Always zoom so the task's horizon is comfortably in view
       const horizonZ = getZDepth(task.horizon);
-      const { currentZ } = cameraStore.getState();
-      const isVisible = horizonZ <= currentZ && horizonZ >= currentZ - 15;
-      if (!isVisible && task.horizon !== 'someday') {
-        const targetZ = Math.max(horizonZ + 7.5, SCENE_CONSTANTS.farBoundary);
-        cameraStore.setState({ targetZ, velocity: 0, isAnimating: true });
-      }
+      const targetZ = task.horizon === 'someday'
+        ? Math.max(horizonZ + 5, SCENE_CONSTANTS.farBoundary)
+        : Math.max(horizonZ + 5, SCENE_CONSTANTS.farBoundary);
+      cameraStore.setState({ targetZ, velocity: 0, isAnimating: true });
     } else {
       cameraStore.getState().setPan(0, 0);
     }
@@ -396,7 +394,7 @@ export function TaskDetail() {
   const backdropStyle: React.CSSProperties = {
     position: 'fixed',
     inset: 0,
-    background: 'rgba(0, 0, 0, 0.3)',
+    background: 'transparent',
     zIndex: 119,
     pointerEvents: isOpen ? 'auto' : 'none',
     opacity: isOpen ? 1 : 0,

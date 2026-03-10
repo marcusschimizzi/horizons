@@ -1,9 +1,16 @@
+import { redirect } from 'next/navigation';
 import { db } from '@/db';
 import { tasks } from '@/db/schema';
 import { and, eq, lt, isNotNull, sql } from 'drizzle-orm';
+import { auth } from '@/lib/auth';
 import SceneLoader from '@/components/SceneLoader';
 
 export default async function Home() {
+  const session = await auth();
+  if (!session?.user?.id) redirect('/login');
+
+  const userId = session.user.id;
+
   try {
     const now = new Date();
 
@@ -19,6 +26,7 @@ export default async function Home() {
         targetDateEarliest: sql`NOW()`,
       })
       .where(and(
+        eq(tasks.userId, userId),
         eq(tasks.status, 'active'),
         isNotNull(tasks.targetDateLatest),
         lt(tasks.targetDateLatest, now),
@@ -37,11 +45,14 @@ export default async function Home() {
       }
     }
 
-    const allTasks = await db.select().from(tasks).where(eq(tasks.status, 'active'));
+    const allTasks = await db.select().from(tasks).where(
+      and(eq(tasks.userId, userId), eq(tasks.status, 'active')),
+    );
     return (
       <SceneLoader
         initialTasks={allTasks}
         driftSummary={drifted.length > 0 ? { count: drifted.length } : null}
+        user={{ name: session.user.name, email: session.user.email }}
       />
     );
   } catch (e) {

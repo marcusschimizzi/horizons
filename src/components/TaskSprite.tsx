@@ -8,7 +8,7 @@ import * as THREE from 'three';
 import type { Task, TagCategory } from '@/types/task';
 import { TAG_COLORS } from '@/types/task';
 import { useSceneConfig, getExperienceConfig } from '@/stores/theme-store';
-import { TaskStoreContext, useIsCompleting, useIsDropping } from '@/stores/task-store';
+import { TaskStoreContext, useTaskStore, useIsCompleting, useIsDropping } from '@/stores/task-store';
 
 const TAG_CATEGORY_SET = new Set<string>(Object.keys(TAG_COLORS));
 
@@ -28,6 +28,8 @@ export function TaskSprite({ task, position, isNew }: TaskSpriteProps) {
   const isCompleting = useIsCompleting(task.id);
   const isDropping = useIsDropping(task.id);
   const spriteConfig = useSceneConfig().sprite;
+  const selectedTaskId = useTaskStore((s) => s.selectedTaskId);
+  const isDimmed = selectedTaskId !== null && selectedTaskId !== task.id;
 
   // Refs for entrance animation (direct mutation, no React re-renders)
   const groupRef = useRef<THREE.Group>(null);
@@ -102,10 +104,11 @@ export function TaskSprite({ task, position, isNew }: TaskSpriteProps) {
       return;
     }
 
-    // Drift-based opacity reduction in steady state
+    // Drift-based opacity reduction + selection dimming in steady state
     if (!isNew) {
       const driftReduction = Math.min((task.driftCount ?? 0) * 0.08, 0.5);
-      materialRef.current.opacity = Math.max(0.4, opacity - driftReduction);
+      const dimFactor = isDimmed ? 0.2 : 1;
+      materialRef.current.opacity = Math.max(0.1, (opacity - driftReduction) * dimFactor);
     }
 
     // Refinement ring breathing pulse

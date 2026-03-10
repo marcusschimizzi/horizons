@@ -1,7 +1,8 @@
 import { NextRequest } from 'next/server';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { db } from '@/db';
 import { tasks } from '@/db/schema';
+import { getRequiredUserId } from '@/lib/auth-helpers';
 
 const UPDATABLE_FIELDS = [
   'title',
@@ -20,9 +21,14 @@ export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const userId = await getRequiredUserId();
+  if (userId instanceof Response) return userId;
+
   try {
     const { id } = await params;
-    const [task] = await db.select().from(tasks).where(eq(tasks.id, id));
+    const [task] = await db.select().from(tasks).where(
+      and(eq(tasks.id, id), eq(tasks.userId, userId)),
+    );
 
     if (!task) {
       return Response.json(
@@ -44,6 +50,9 @@ export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const userId = await getRequiredUserId();
+  if (userId instanceof Response) return userId;
+
   try {
     const { id } = await params;
     const body = await request.json();
@@ -65,7 +74,7 @@ export async function PATCH(
     const [updated] = await db
       .update(tasks)
       .set(updateFields)
-      .where(eq(tasks.id, id))
+      .where(and(eq(tasks.id, id), eq(tasks.userId, userId)))
       .returning();
 
     if (!updated) {
@@ -88,11 +97,14 @@ export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  const userId = await getRequiredUserId();
+  if (userId instanceof Response) return userId;
+
   try {
     const { id } = await params;
     const [deleted] = await db
       .delete(tasks)
-      .where(eq(tasks.id, id))
+      .where(and(eq(tasks.id, id), eq(tasks.userId, userId)))
       .returning();
 
     if (!deleted) {

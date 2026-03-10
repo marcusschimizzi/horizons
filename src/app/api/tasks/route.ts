@@ -1,11 +1,17 @@
 import { NextRequest } from 'next/server';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { db } from '@/db';
 import { tasks } from '@/db/schema';
+import { getRequiredUserId } from '@/lib/auth-helpers';
 
 export async function GET() {
+  const userId = await getRequiredUserId();
+  if (userId instanceof Response) return userId;
+
   try {
-    const allTasks = await db.select().from(tasks).where(eq(tasks.status, 'active'));
+    const allTasks = await db.select().from(tasks).where(
+      and(eq(tasks.userId, userId), eq(tasks.status, 'active')),
+    );
     return Response.json(allTasks);
   } catch {
     return Response.json(
@@ -16,6 +22,9 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  const userId = await getRequiredUserId();
+  if (userId instanceof Response) return userId;
+
   try {
     const body = await request.json();
 
@@ -36,6 +45,7 @@ export async function POST(request: NextRequest) {
     const [created] = await db
       .insert(tasks)
       .values({
+        userId,
         title: body.title.trim(),
         rawInput: body.rawInput.trim(),
         targetDateEarliest: body.targetDateEarliest ? new Date(body.targetDateEarliest) : null,

@@ -2,9 +2,10 @@ import { NextRequest } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { zodOutputFormat } from '@anthropic-ai/sdk/helpers/zod';
 import { z } from 'zod';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { db } from '@/db';
 import { tasks } from '@/db/schema';
+import { getRequiredUserId } from '@/lib/auth-helpers';
 
 // --- Zod schemas for structured output ---
 
@@ -33,6 +34,9 @@ const client = new Anthropic();
 // --- POST handler ---
 
 export async function POST(request: NextRequest) {
+  const userId = await getRequiredUserId();
+  if (userId instanceof Response) return userId;
+
   try {
     const body = await request.json();
     const { taskId, userResponse } = body;
@@ -44,8 +48,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Fetch task from DB
-    const [task] = await db.select().from(tasks).where(eq(tasks.id, taskId));
+    // Fetch task from DB — scoped to current user
+    const [task] = await db.select().from(tasks).where(
+      and(eq(tasks.id, taskId), eq(tasks.userId, userId)),
+    );
     if (!task) {
       return Response.json(
         { error: 'Task not found', code: 'TASK_NOT_FOUND' },
@@ -76,7 +82,7 @@ export async function POST(request: NextRequest) {
         await db
           .update(tasks)
           .set({ refinementPrompt: JSON.stringify(prompt) })
-          .where(eq(tasks.id, taskId));
+          .where(and(eq(tasks.id, taskId), eq(tasks.userId, userId)));
       }
 
       return Response.json(prompt);
@@ -104,7 +110,7 @@ export async function POST(request: NextRequest) {
 
       const parsed = response.parsed_output;
       if (parsed) {
-        // Apply update directly to DB
+        // Apply update directly to DB — scoped to current user
         await db
           .update(tasks)
           .set({
@@ -113,7 +119,7 @@ export async function POST(request: NextRequest) {
             needsRefinement: false,
             refinementPrompt: null,
           })
-          .where(eq(tasks.id, taskId));
+          .where(and(eq(tasks.id, taskId), eq(tasks.userId, userId)));
 
         return Response.json({
           title: parsed.title,

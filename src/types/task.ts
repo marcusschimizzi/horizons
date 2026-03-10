@@ -3,6 +3,7 @@ import type { Horizon } from '@/lib/horizons';
 /** Row shape from the database (matches Drizzle schema select type) */
 export interface TaskRow {
   id: string;
+  userId: string;
   rawInput: string;
   title: string;
   targetDateEarliest: Date | null;

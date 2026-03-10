@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import { TaskStoreProvider } from '@/stores/task-store';
 import type { TaskRow } from '@/types/task';
+import { UserMenu } from '@/components/UserMenu';
 
 // ---------------------------------------------------------------------------
 // Dynamic import: prevents WebGL/Canvas code from running during SSR
@@ -50,9 +51,10 @@ interface SceneLoaderProps {
   initialTasks: TaskRow[];
   error?: boolean;
   driftSummary?: { count: number } | null;
+  user?: { name?: string | null; email?: string | null } | null;
 }
 
-export default function SceneLoader({ initialTasks, error, driftSummary }: SceneLoaderProps) {
+export default function SceneLoader({ initialTasks, error, driftSummary, user }: SceneLoaderProps) {
   if (error) {
     return <ErrorState />;
   }
@@ -61,6 +63,7 @@ export default function SceneLoader({ initialTasks, error, driftSummary }: Scene
     <TaskStoreProvider initialTasks={initialTasks}>
       <div className="h-screen w-screen overflow-hidden">
         <HorizonScene driftSummary={driftSummary} />
+        {user && <UserMenu userName={user.name} userEmail={user.email} />}
       </div>
     </TaskStoreProvider>
   );
