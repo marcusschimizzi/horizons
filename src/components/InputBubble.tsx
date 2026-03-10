@@ -348,6 +348,7 @@ export function InputBubble() {
       <div style={inputWrapperStyle}>
         <input
           ref={inputRef}
+          id="task-input"
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}

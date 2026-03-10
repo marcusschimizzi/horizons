@@ -22,6 +22,7 @@ import { ListView } from './ListView';
 import { HorizonIndicator } from './HorizonIndicator';
 import { ExperienceSwitcher } from './ExperienceSwitcher';
 import { TextureToggle } from './TextureToggle';
+import { KeyboardShortcuts } from './KeyboardShortcuts';
 
 import type { ThemeSceneConfig } from '@/lib/theme-config';
 
@@ -202,6 +203,7 @@ export default function HorizonScene({ driftSummary }: HorizonSceneProps) {
   const toggleListView = useTaskStore((s) => s.toggleListView);
   const sceneConfig = useSceneConfig();
   const { css } = useExperienceConfig();
+  const [showShortcuts, setShowShortcuts] = useState(false);
 
   const cardHorizonsSet = useMemo(
     () => new Set<string>(sceneConfig.cardHorizons),
@@ -220,8 +222,15 @@ export default function HorizonScene({ driftSummary }: HorizonSceneProps) {
       if (e.key === 'l' || e.key === 'L') {
         toggleListView();
       }
+      if (e.key === '?') {
+        setShowShortcuts((prev) => !prev);
+      }
+      if (e.key === '/') {
+        e.preventDefault();
+        document.getElementById('task-input')?.focus();
+      }
     },
-    [toggleListView],
+    [toggleListView, setShowShortcuts],
   );
 
   useEffect(() => {
@@ -289,6 +298,7 @@ export default function HorizonScene({ driftSummary }: HorizonSceneProps) {
       <TaskDetail />
       <DebugOverlay taskBreakdown={taskBreakdown} />
       <TextureToggle />
+      <KeyboardShortcuts open={showShortcuts} onClose={() => setShowShortcuts(false)} />
     </>
   );
 }
